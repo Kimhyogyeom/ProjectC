@@ -13,12 +13,19 @@ public class PlayerHealth : MonoBehaviour
     [Header("Stats")]
     [SerializeField] int _maxHp = 100;
 
+    [Header("Invincibility")]
+    [SerializeField] float _invincibleDuration = 1.5f;
+
     [Header("UI")]
     [SerializeField] Image _hpBarFill;
+
+    [Header("Debug (Read Only)")]
+    [SerializeField] int _currentHp;
+    [SerializeField] bool _isInvincible;
     #endregion
 
     #region Private Fields
-    int _currentHp;
+    float _lastHitTime = -999f;
     #endregion
 
     #region Unity Lifecycle
@@ -27,13 +34,22 @@ public class PlayerHealth : MonoBehaviour
         _currentHp = _maxHp;
         UpdateHPBar();
     }
+
+    void Update()
+    {
+        _isInvincible = Time.time < _lastHitTime + _invincibleDuration;
+    }
     #endregion
 
     #region Public API
-    /// <summary>데미지를 받아 HP 감소, 0 이하 시 사망 처리</summary>
+    /// <summary>데미지를 받아 HP 감소, 0 이하 시 사망 처리 (무적 시간 중 무시)</summary>
     public void TakeDamage(int damage)
     {
+        if (_isInvincible) return;
+
+        _lastHitTime = Time.time;
         _currentHp -= damage;
+        _currentHp = Mathf.Max(_currentHp, 0);
         UpdateHPBar();
 
         if (_currentHp <= 0)
