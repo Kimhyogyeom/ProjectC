@@ -15,6 +15,7 @@ public class Enemy : MonoBehaviour
     [Header("Stats")]
     [SerializeField] int _maxHp = 30;
     [SerializeField] float _moveSpeed = 2f;
+    [SerializeField] float _pushForce = 5f;       // 플레이어에게 밀려나는 힘
     [SerializeField] float _stopDistance = 1f;    // 플레이어와 유지할 거리
     [SerializeField] int _damage = 10;            // 플레이어에게 주는 데미지
     [SerializeField] float _attackCooldown = 1f;  // 재접촉 후 데미지 쿨타임
@@ -100,8 +101,13 @@ public class Enemy : MonoBehaviour
     {
         if (!other.CompareTag("Player")) return;
 
-        // 붙어있는 동안 쿨타임마다 데미지
-        if (0 < _attackTimer) return;
+        // 겹침 방지 - 플레이어 반대 방향으로 밀어냄 (Rigidbody 없이 처리)
+        Vector3 pushDirection = (transform.position - other.transform.position).normalized;
+        pushDirection.y = 0f;
+        transform.position += pushDirection * _pushForce * Time.deltaTime;
+
+        // 쿨타임마다 데미지
+        if (_attackTimer > 0) return;
 
         PlayerHealth playerHealth = other.GetComponent<PlayerHealth>();
         if (playerHealth != null)
