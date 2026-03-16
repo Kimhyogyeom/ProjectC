@@ -16,6 +16,7 @@ public class Projectile : MonoBehaviour
     #region Private Fields
     Vector3 _direction;
     float _speed;
+    bool _hit = false; // 중복 충돌 방지
     #endregion
 
     #region Unity Lifecycle
@@ -29,8 +30,11 @@ public class Projectile : MonoBehaviour
     #region Collision
     void OnTriggerEnter(Collider other)
     {
-        // 적과 충돌 시 데미지 처리
+        // 중복 충돌 방지
+        if (_hit) return;
         if (!other.CompareTag("Enemy")) return;
+
+        _hit = true;
 
         Enemy enemy = other.GetComponent<Enemy>();
         if (enemy != null)
