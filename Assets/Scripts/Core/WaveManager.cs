@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -41,6 +42,7 @@ public class WaveManager : MonoBehaviour
         int spawnCount = _startEnemyCount + (_currentWave - 1) * _enemyIncreasePerWave;
 
         Debug.Log($"[Wave] 웨이브 {_currentWave} 시작 - 적 {spawnCount}마리");
+        OnWaveStarted?.Invoke(_currentWave);
 
         _aliveEnemyCount = spawnCount;
         _isWaveActive = true;
@@ -59,6 +61,7 @@ public class WaveManager : MonoBehaviour
         if (_aliveEnemyCount <= 0 && _isWaveActive)
         {
             _isWaveActive = false;
+            OnWaveCleared?.Invoke();
             StartCoroutine(NextWaveRoutine());
         }
     }
@@ -68,7 +71,7 @@ public class WaveManager : MonoBehaviour
     void SpawnEnemy()
     {
         // 플레이어 주변 랜덤 위치에 스폰
-        Vector2 randomCircle = Random.insideUnitCircle.normalized * _spawnRadius;
+        Vector2 randomCircle = UnityEngine.Random.insideUnitCircle.normalized * _spawnRadius;
         Vector3 spawnPosition = _player.position + new Vector3(randomCircle.x, 0f, randomCircle.y);
 
         Instantiate(_enemyPrefab, spawnPosition, Quaternion.identity);
@@ -86,5 +89,11 @@ public class WaveManager : MonoBehaviour
 
     #region Public API
     public int CurrentWave => _currentWave;
+
+    /// <summary>웨이브 시작 시 호출 (wave 번호 전달)</summary>
+    public event Action<int> OnWaveStarted;
+
+    /// <summary>웨이브 클리어 시 호출</summary>
+    public event Action OnWaveCleared;
     #endregion
 }
