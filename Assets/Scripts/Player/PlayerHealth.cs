@@ -37,6 +37,7 @@ public class PlayerHealth : MonoBehaviour
 
     void Update()
     {
+        // 인스펙터 실시간 확인용
         _isInvincible = Time.time < _lastHitTime + _invincibleDuration;
     }
     #endregion
@@ -45,7 +46,8 @@ public class PlayerHealth : MonoBehaviour
     /// <summary>데미지를 받아 HP 감소, 0 이하 시 사망 처리 (무적 시간 중 무시)</summary>
     public void TakeDamage(int damage)
     {
-        if (_isInvincible) return;
+        // 캐싱값 대신 인라인 계산 (같은 프레임 다중 피격 방지)
+        if (Time.time < _lastHitTime + _invincibleDuration) return;
 
         _lastHitTime = Time.time;
         _currentHp -= damage;
