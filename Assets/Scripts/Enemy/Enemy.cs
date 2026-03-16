@@ -168,6 +168,11 @@ public class Enemy : MonoBehaviour
     #region Death
     void Die()
     {
+        // WaveManager에 처치 알림
+        WaveManager waveManager = FindFirstObjectByType<WaveManager>();
+        if (waveManager != null)
+            waveManager.OnEnemyDied();
+
         // TODO: 사망 이펙트, 경험치 드랍 등 추가 예정
         Destroy(gameObject);
     }
