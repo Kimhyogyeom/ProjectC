@@ -1,8 +1,10 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// 플레이어 HP 관리
 /// - 적에게 닿으면 데미지
+/// - HP 바 UI 연동
 /// - HP 0 이하 시 사망 처리
 /// </summary>
 public class PlayerHealth : MonoBehaviour
@@ -10,6 +12,9 @@ public class PlayerHealth : MonoBehaviour
     #region Serialized Fields
     [Header("Stats")]
     [SerializeField] int _maxHp = 100;
+
+    [Header("UI")]
+    [SerializeField] Image _hpBarFill;
     #endregion
 
     #region Private Fields
@@ -20,6 +25,7 @@ public class PlayerHealth : MonoBehaviour
     void Awake()
     {
         _currentHp = _maxHp;
+        UpdateHPBar();
     }
     #endregion
 
@@ -28,12 +34,18 @@ public class PlayerHealth : MonoBehaviour
     public void TakeDamage(int damage)
     {
         _currentHp -= damage;
-        Debug.Log($"[Player] HP: {_currentHp} / {_maxHp}");
+        UpdateHPBar();
 
         if (_currentHp <= 0)
-        {
             Die();
-        }
+    }
+    #endregion
+
+    #region HP Bar
+    void UpdateHPBar()
+    {
+        if (_hpBarFill == null) return;
+        _hpBarFill.fillAmount = (float)_currentHp / _maxHp;
     }
     #endregion
 

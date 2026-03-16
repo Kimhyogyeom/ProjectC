@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 964202052084563671}
   - component: {fileID: 3781923709986036815}
   m_Layer: 0
-  m_Name: Sphere
+  m_Name: PlayerWeapon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -172,4 +172,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _lifeTime: 3
-  _damage: 10
+  _damage: 100
