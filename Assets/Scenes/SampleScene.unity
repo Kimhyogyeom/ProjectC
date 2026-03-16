@@ -929,8 +929,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bbf57fe8cdc45348a173f6d3d4aa75e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxHp: 1000
+  _maxHp: 300
+  _invincibleDuration: 1.5
   _hpBarFill: {fileID: 1087738735}
+  _currentHp: 0
+  _isInvincible: 0
 --- !u!1 &889492837
 GameObject:
   m_ObjectHideFlags: 0
@@ -948,7 +951,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!64 &889492838
 MeshCollider:
