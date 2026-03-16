@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -67,11 +68,16 @@ public class PlayerHealth : MonoBehaviour
     }
     #endregion
 
+    #region Public API (Events)
+    /// <summary>플레이어 사망 시 호출</summary>
+    public event Action OnPlayerDied;
+    #endregion
+
     #region Death
     void Die()
     {
-        // TODO: 게임 오버 UI, 씬 재시작 등 추가 예정
-        Debug.Log("[Player] 사망");
+        gameObject.SetActive(false);
+        OnPlayerDied?.Invoke();
     }
     #endregion
 }
