@@ -30,12 +30,16 @@ public class Enemy : MonoBehaviour
     Transform _player;
     float _attackTimer;
     bool _isKnockedBack;
+    bool _isInContact;
+    Coroutine _knockbackCoroutine;
+    Collider _collider;
     #endregion
 
     #region Unity Lifecycle
     void Awake()
     {
         _currentHp = _maxHp;
+        _collider = GetComponent<Collider>();
         UpdateHPBar();
     }
 
@@ -52,7 +56,8 @@ public class Enemy : MonoBehaviour
         if (0 < _attackTimer)
             _attackTimer -= Time.deltaTime;
 
-        if (!_isKnockedBack)
+        // 넉백 중이거나 플레이어와 접촉 중엔 추적 안 함 (떨림 방지)
+        if (!_isKnockedBack && !_isInContact)
             ChasePlayer();
     }
     #endregion
@@ -82,18 +87,16 @@ public class Enemy : MonoBehaviour
     {
         if (!other.CompareTag("Player")) return;
 
-        // 쿨타임 중이면 데미지 없음
-        if (0 < _attackTimer) return;
+        // 데미지는 쿨타임 체크, 넉백은 항상 적용
+        if (_attackTimer <= 0)
+        {
+            PlayerHealth playerHealth = other.GetComponent<PlayerHealth>();
+            if (playerHealth != null)
+                playerHealth.TakeDamage(_damage);
 
-        // 플레이어 데미지
-        PlayerHealth playerHealth = other.GetComponent<PlayerHealth>();
-        if (playerHealth != null)
-            playerHealth.TakeDamage(_damage);
+            _attackTimer = _attackCooldown;
+        }
 
-        // 쿨타임 초기화
-        _attackTimer = _attackCooldown;
-
-        // 넉백 (플레이어 반대 방향으로)
         Knockback(other.transform.position);
     }
 
@@ -101,13 +104,18 @@ public class Enemy : MonoBehaviour
     {
         if (!other.CompareTag("Player")) return;
 
-        // 겹침 방지 - 플레이어 반대 방향으로 밀어냄 (Rigidbody 없이 처리)
-        Vector3 pushDirection = (transform.position - other.transform.position).normalized;
-        pushDirection.y = 0f;
-        transform.position += pushDirection * _pushForce * Time.deltaTime;
+        _isInContact = true;
 
-        // 쿨타임마다 데미지
-        if (_attackTimer > 0) return;
+        // 겹침 방지 - 넉백 중이 아닐 때만 밀어냄
+        if (!_isKnockedBack)
+        {
+            Vector3 pushDirection = (transform.position - other.transform.position).normalized;
+            pushDirection.y = 0f;
+            transform.position += pushDirection * _pushForce * Time.deltaTime;
+        }
+
+        // 쿨타임마다 데미지 (넉백 중엔 재호출 안 함)
+        if (_attackTimer > 0 || _isKnockedBack) return;
 
         PlayerHealth playerHealth = other.GetComponent<PlayerHealth>();
         if (playerHealth != null)
@@ -115,6 +123,12 @@ public class Enemy : MonoBehaviour
 
         _attackTimer = _attackCooldown;
         Knockback(other.transform.position);
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (!other.CompareTag("Player")) return;
+        _isInContact = false;
     }
     #endregion
 
@@ -123,24 +137,33 @@ public class Enemy : MonoBehaviour
     {
         Vector3 knockbackDirection = (transform.position - playerPosition).normalized;
         knockbackDirection.y = 0f;
-        StartCoroutine(KnockbackRoutine(knockbackDirection));
+
+        // 이전 넉백 코루틴 중단 후 새로 시작
+        if (_knockbackCoroutine != null)
+            StopCoroutine(_knockbackCoroutine);
+        _knockbackCoroutine = StartCoroutine(KnockbackRoutine(knockbackDirection));
     }
 
     IEnumerator KnockbackRoutine(Vector3 direction)
     {
         _isKnockedBack = true;
+        _isInContact = false;
+
+        // 넉백 중 트리거 비활성화 → 충돌 이벤트 차단으로 떨림 방지
+        if (_collider != null) _collider.enabled = false;
 
         float elapsed = 0f;
-        float duration = 0.15f; // 넉백 지속 시간 (초)
+        float duration = 0.15f;
 
         while (elapsed < duration)
         {
-            float ratio = 1f - (elapsed / duration); // 점점 느려지는 효과
+            float ratio = 1f - (elapsed / duration);
             transform.position += direction * _knockbackDistance * ratio * Time.deltaTime / duration;
             elapsed += Time.deltaTime;
             yield return null;
         }
 
+        if (_collider != null) _collider.enabled = true;
         _isKnockedBack = false;
     }
     #endregion
