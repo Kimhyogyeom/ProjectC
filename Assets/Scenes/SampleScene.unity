@@ -155,7 +155,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 600, y: 600}
+  m_SizeDelta: {x: 500, y: 500}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &169527724
 MonoBehaviour:
@@ -177,7 +177,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: bc04eb1683d02af4a97362b8f1ac2794, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 442029ef795c9a14f891ff2cf836b92b, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1297,6 +1297,7 @@ GameObject:
   - component: {fileID: 849863816}
   - component: {fileID: 849863817}
   - component: {fileID: 849863818}
+  - component: {fileID: 849863819}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1449,7 +1450,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 098182a75dd940a4b96ab5647940b465, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _attackRange: 10
+  _attackRange: 5
   _attackCooldown: 1
   _firePoint: {fileID: 290465582}
   _projectilePrefab: {fileID: 9033449637366701456, guid: 35fde41653061ec47b74e46ff3f2fb58, type: 3}
@@ -1471,6 +1472,25 @@ MonoBehaviour:
   _hpBarFill: {fileID: 1087738735}
   _currentHp: 0
   _isInvincible: 0
+--- !u!114 &849863819
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849863809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b4e3a34f08f6e74f96bbfb212f7d5af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _baseExpRequired: 10
+  _expGrowthRate: 1.3
+  _orbPickupRadius: 1.5
+  _expBarFill: {fileID: 0}
+  _debugLevel: 1
+  _debugCurrentExp: 0
+  _debugExpRequired: 0
 --- !u!1 &889492837
 GameObject:
   m_ObjectHideFlags: 0
@@ -1536,7 +1556,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 15303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: df841c3626a4b274bbf35d50561bcbc7, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1918,7 +1938,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 842376778f3700f4ba59e62045268598, type: 3}
+  m_Sprite: {fileID: 21300000, guid: eb016d64e197cff42a9533c98f261c41, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
