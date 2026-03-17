@@ -69,7 +69,7 @@ public class PlayerAttack : MonoBehaviour
         Vector3 direction = (target.position - transform.position).normalized;
         direction.y = 0f;
         Quaternion targetRot = Quaternion.LookRotation(direction);
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRot, 720f * Time.deltaTime);
+        transform.rotation = targetRot;
 
         // 공격 애니메이션 (R1=4, R2=5, R3=6 랜덤)
         if (_animator != null)
@@ -100,6 +100,10 @@ public class PlayerAttack : MonoBehaviour
 
         foreach (GameObject enemy in enemies)
         {
+            // 죽은 적 제외
+            Enemy enemyComp = enemy.GetComponent<Enemy>();
+            if (enemyComp != null && enemyComp.IsDead) continue;
+
             float distance = Vector3.Distance(transform.position, enemy.transform.position);
             if (distance < closestDistance)
             {
