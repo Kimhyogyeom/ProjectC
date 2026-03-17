@@ -1,9 +1,10 @@
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
 /// 표창 투사체
 /// - 직선으로 날아가서 적에게 충돌 시 데미지
-/// - 일정 시간 후 자동 제거
+/// - 독, 관통, 데미지 배율 지원
 /// </summary>
 public class Projectile : MonoBehaviour
 {
@@ -16,13 +17,19 @@ public class Projectile : MonoBehaviour
     #region Private Fields
     Vector3 _direction;
     float _speed;
-    bool _hit = false; // 중복 충돌 방지
+    float _damageRatio = 1f;    // 분신 데미지 배율
+    bool _isPierce = false;     // 관통 여부
+    bool _hasPoison = false;    // 독 여부
+    float _poisonDamage = 0f;
+    float _poisonDuration = 0f;
+    bool _isPoisonSpreading = false;    // Lv5 전염
+
+    bool _hit = false;
     #endregion
 
     #region Unity Lifecycle
     void Update()
     {
-        // 직선 이동
         transform.Translate(_direction * _speed * Time.deltaTime, Space.World);
     }
     #endregion
@@ -30,31 +37,46 @@ public class Projectile : MonoBehaviour
     #region Collision
     void OnTriggerEnter(Collider other)
     {
-        // 중복 충돌 방지
-        if (_hit) return;
+        if (_hit && !_isPierce) return;
         if (!other.CompareTag("Enemy")) return;
 
-        _hit = true;
+        if (!_isPierce) _hit = true;
 
         Enemy enemy = other.GetComponent<Enemy>();
         if (enemy != null)
         {
-            enemy.TakeDamage(_damage);
+            int finalDamage = Mathf.RoundToInt(_damage * _damageRatio);
+            enemy.TakeDamage(finalDamage);
+
+            // 독 적용
+            if (_hasPoison)
+                enemy.ApplyPoison(_poisonDamage, _poisonDuration, _isPoisonSpreading);
         }
 
-        Destroy(gameObject);
+        if (!_isPierce)
+            Destroy(gameObject);
     }
     #endregion
 
     #region Public API
-    /// <summary>발사 방향과 속도를 설정 (PlayerAttack에서 호출)</summary>
-    public void Init(Vector3 direction, float speed)
+    /// <summary>기본 초기화</summary>
+    public void Init(Vector3 direction, float speed, float damageRatio = 1f, bool isPierce = false)
     {
         _direction = direction;
         _speed = speed;
+        _damageRatio = damageRatio;
+        _isPierce = isPierce;
 
-        // 수명 끝나면 자동 제거
         Destroy(gameObject, _lifeTime);
+    }
+
+    /// <summary>독 설정</summary>
+    public void SetPoison(float damage, float duration, bool isSpreading)
+    {
+        _hasPoison = true;
+        _poisonDamage = damage;
+        _poisonDuration = duration;
+        _isPoisonSpreading = isSpreading;
     }
     #endregion
 }

@@ -20,12 +20,17 @@ public class PlayerLevel : MonoBehaviour
     [Header("UI")]
     [SerializeField] Image _expBarFill;
     [SerializeField] TMP_Text _levelText;
+
+    [Header("References")]
+    [SerializeField] SkillSelectionUI _skillSelectionUI;
     #endregion
 
     #region Private Fields
     int _currentLevel = 1;
     int _currentExp = 0;
     int _expRequired;
+    float _orbRadiusMultiplier = 1f;    // 자석 스킬 배율
+    bool _isGlobalMagnet = false;       // 자석 Lv5: 맵 전체 흡수
     #endregion
 
     #region Debug (Inspector 실시간 확인용)
@@ -36,7 +41,7 @@ public class PlayerLevel : MonoBehaviour
     #endregion
 
     #region Properties
-    public float OrbPickupRadius => _orbPickupRadius;
+    public float OrbPickupRadius => _orbPickupRadius * _orbRadiusMultiplier;
     #endregion
 
     #region Unity Lifecycle
@@ -48,8 +53,9 @@ public class PlayerLevel : MonoBehaviour
 
     void Update()
     {
-        // 주변 경험치 구슬 감지 및 흡수
-        Collider[] orbs = Physics.OverlapSphere(transform.position, _orbPickupRadius);
+        // 주변 경험치 구슬 감지 및 흡수 (자석 Lv5: 매우 큰 반경)
+        float radius = _isGlobalMagnet ? 999f : OrbPickupRadius;
+        Collider[] orbs = Physics.OverlapSphere(transform.position, radius);
         foreach (Collider orb in orbs)
         {
             ExpOrb expOrb = orb.GetComponent<ExpOrb>();
@@ -84,7 +90,19 @@ public class PlayerLevel : MonoBehaviour
 
         Debug.Log($"레벨업! 현재 레벨: {_currentLevel} / 다음 레벨까지: {_expRequired}");
 
-        // TODO: 스킬 선택 UI 호출
+        // 스킬 선택 UI 호출
+        SkillManager skillManager = GetComponent<SkillManager>();
+        if (_skillSelectionUI != null && skillManager != null)
+            _skillSelectionUI.Show(skillManager);
+    }
+    #endregion
+
+    #region Public API
+    /// <summary>자석 스킬: 흡수 범위 배율 설정</summary>
+    public void SetOrbRadiusMultiplier(float multiplier, bool isGlobal)
+    {
+        _orbRadiusMultiplier = multiplier;
+        _isGlobalMagnet = isGlobal;
     }
     #endregion
 

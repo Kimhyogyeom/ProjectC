@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5df86a2d30b18724db1470e456416f5d, type: 3}
+  m_Name: SK_SmokeBomb
+  m_EditorClassIdentifier: 
+  skillType: 4
+  skillName: "\uC5F0\uB9C9\uD0C4"
+  icon: {fileID: 0}
+  levelDescriptions:
+  - "\uD53C\uACA9 \uC2DC 10% \uD655\uB960 \uD68C\uD53C"
+  - "\uD53C\uACA9 \uC2DC 15% \uD655\uB960 \uD68C\uD53C"
+  - "\uD53C\uACA9 \uC2DC 20% \uD655\uB960 \uD68C\uD53C"
+  - "\uD53C\uACA9 \uC2DC 25% \uD655\uB960 \uD68C\uD53C"
+  - "[UNIQUE] \uD68C\uD53C \uC2DC \uC21C\uAC04\uC774\uB3D9 + \uBB34\uC801 0.5\uCD08"
+  levelValues:
+  - 0.1
+  - 0.15
+  - 0.2
+  - 0.25
+  - 0.3
