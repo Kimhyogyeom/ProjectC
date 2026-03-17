@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -29,12 +30,19 @@ public class PlayerHealth : MonoBehaviour
     float _lastHitTime = -999f;
     float _dodgeChance = 0f;        // 연막탄 회피 확률
     bool _dodgeTeleport = false;    // 연막탄 Lv5: 회피 시 순간이동
+    Renderer[] _renderers;
+    bool[] _rendererDefaultState;
+    Coroutine _flashCoroutine;
     #endregion
 
     #region Unity Lifecycle
     void Awake()
     {
         _currentHp = _maxHp;
+        _renderers = GetComponentsInChildren<Renderer>();
+        _rendererDefaultState = new bool[_renderers.Length];
+        for (int i = 0; i < _renderers.Length; i++)
+            _rendererDefaultState[i] = _renderers[i].enabled;
         UpdateHPBar();
     }
 
@@ -62,6 +70,10 @@ public class PlayerHealth : MonoBehaviour
         _currentHp -= damage;
         _currentHp = Mathf.Max(_currentHp, 0);
         UpdateHPBar();
+
+        // 깜빡임 시작
+        if (_flashCoroutine != null) StopCoroutine(_flashCoroutine);
+        _flashCoroutine = StartCoroutine(FlashRoutine());
 
         if (_currentHp <= 0)
             Die();
@@ -97,6 +109,31 @@ public class PlayerHealth : MonoBehaviour
         transform.position += randomOffset;
         _lastHitTime = Time.time; // 무적 시간 적용
     }
+
+    #region Flash
+    IEnumerator FlashRoutine()
+    {
+        float elapsed = 0f;
+        float interval = 0.1f;  // 깜빡임 간격
+
+        while (elapsed < _invincibleDuration)
+        {
+            SetRenderersVisible(false);
+            yield return new WaitForSeconds(interval);
+            SetRenderersVisible(true);
+            yield return new WaitForSeconds(interval);
+            elapsed += interval * 2f;
+        }
+
+        SetRenderersVisible(true);
+    }
+
+    void SetRenderersVisible(bool visible)
+    {
+        for (int i = 0; i < _renderers.Length; i++)
+            _renderers[i].enabled = visible && _rendererDefaultState[i];
+    }
+    #endregion
 
     #region Death
     void Die()
