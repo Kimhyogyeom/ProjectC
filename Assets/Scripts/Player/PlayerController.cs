@@ -19,6 +19,7 @@ public class PlayerController : MonoBehaviour
 
     #region Private Fields
     CharacterController _controller;
+    Animator _animator;
     Vector3 _moveDirection;
     bool _isMoving;
     float _speedMultiplier = 1f;    // 질풍 스킬 배율
@@ -28,6 +29,7 @@ public class PlayerController : MonoBehaviour
     void Awake()
     {
         _controller = GetComponent<CharacterController>();
+        _animator = GetComponentInChildren<Animator>();
     }
 
     void Update()
@@ -49,6 +51,15 @@ public class PlayerController : MonoBehaviour
         if (_isMoving)
         {
             _controller.Move(_moveDirection.normalized * _moveSpeed * _speedMultiplier * Time.deltaTime);
+        }
+
+        // 애니메이션 파라미터 업데이트 (로컬 방향으로 변환)
+        if (_animator != null)
+        {
+            _animator.SetBool("Moving", _isMoving);
+            Vector3 localDir = transform.InverseTransformDirection(_moveDirection);
+            _animator.SetFloat("Velocity X", localDir.x);
+            _animator.SetFloat("Velocity Z", localDir.z);
         }
     }
 
