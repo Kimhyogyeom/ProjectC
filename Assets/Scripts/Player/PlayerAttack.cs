@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -23,6 +24,7 @@ public class PlayerAttack : MonoBehaviour
 
     #region Private Fields
     PlayerController _playerController;
+    Animator _animator;
     float _lastAttackTime;
 
     // 스킬 상태
@@ -40,6 +42,7 @@ public class PlayerAttack : MonoBehaviour
     void Awake()
     {
         _playerController = GetComponent<PlayerController>();
+        _animator = GetComponentInChildren<Animator>();
     }
 
     void Update()
@@ -65,10 +68,27 @@ public class PlayerAttack : MonoBehaviour
 
         Vector3 direction = (target.position - transform.position).normalized;
         direction.y = 0f;
-        transform.rotation = Quaternion.LookRotation(direction);
+        Quaternion targetRot = Quaternion.LookRotation(direction);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRot, 720f * Time.deltaTime);
 
-        FireProjectiles(direction);
+        // 공격 애니메이션 (R1=4, R2=5, R3=6 랜덤)
+        if (_animator != null)
+        {
+            _animator.SetInteger("Weapon", 0);
+            _animator.SetInteger("Jumping", 0);
+            _animator.SetInteger("TriggerNumber", 4);
+            _animator.SetInteger("Action", Random.Range(1, 7));
+            _animator.SetTrigger("Trigger");
+        }
+
+        StartCoroutine(FireWithDelay(direction, 0.2f));
         _lastAttackTime = Time.time;
+    }
+
+    IEnumerator FireWithDelay(Vector3 direction, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        FireProjectiles(direction);
     }
 
     Transform FindClosestEnemy()
