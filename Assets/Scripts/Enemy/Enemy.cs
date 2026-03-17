@@ -34,9 +34,11 @@ public class Enemy : MonoBehaviour
     Transform _player;
     float _attackTimer;
     bool _isKnockedBack;
+    bool _isDead = false;
     Coroutine _knockbackCoroutine;
     NavMeshAgent _agent;
     Collider _collider;
+    Animator _animator;
     #endregion
 
     #region Unity Lifecycle
@@ -45,6 +47,7 @@ public class Enemy : MonoBehaviour
         _currentHp = _maxHp;
         _agent = GetComponent<NavMeshAgent>();
         _collider = GetComponent<Collider>();
+        _animator = GetComponentInChildren<Animator>();
 
         _agent.speed = _moveSpeed;
         _agent.stoppingDistance = _stopDistance;
@@ -60,13 +63,23 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
-        if (_player == null) return;
+        if (_player == null || _isDead) return;
 
         if (0 < _attackTimer)
             _attackTimer -= Time.deltaTime;
 
         if (!_isKnockedBack)
             _agent.SetDestination(_player.position);
+
+        // 이동 애니메이션
+        if (_animator != null)
+        {
+            bool isMoving = _agent.velocity.sqrMagnitude > 0.1f;
+            _animator.SetBool("Moving", isMoving);
+            Vector3 localVel = transform.InverseTransformDirection(_agent.velocity.normalized);
+            _animator.SetFloat("Velocity X", localVel.x);
+            _animator.SetFloat("Velocity Z", localVel.z);
+        }
     }
     #endregion
 
@@ -135,9 +148,13 @@ public class Enemy : MonoBehaviour
     #endregion
 
     #region Public API
+    public bool IsDead => _isDead;
+
     /// <summary>데미지를 받아 HP 감소, 0 이하 시 사망 처리</summary>
     public void TakeDamage(int damage)
     {
+        if (_isDead) return;
+
         _currentHp -= damage;
         UpdateHPBar();
 
@@ -199,6 +216,21 @@ public class Enemy : MonoBehaviour
     #region Death
     void Die()
     {
+        _isDead = true;
+
+        // 모든 콜라이더 즉시 비활성화 (자식 포함)
+        foreach (Collider col in GetComponentsInChildren<Collider>())
+            col.enabled = false;
+        if (_agent != null) _agent.enabled = false;
+        if (_hpBarFill != null) _hpBarFill.transform.parent.gameObject.SetActive(false);
+
+        // 사망 애니메이션
+        if (_animator != null)
+        {
+            _animator.SetInteger("TriggerNumber", 7);
+            _animator.SetTrigger("Trigger");
+        }
+
         // 경험치 구슬 스폰
         if (_expOrbPrefab != null)
             Instantiate(_expOrbPrefab, transform.position, Quaternion.identity);
@@ -206,6 +238,36 @@ public class Enemy : MonoBehaviour
         WaveManager waveManager = FindFirstObjectByType<WaveManager>();
         if (waveManager != null)
             waveManager.OnEnemyDied();
+
+        StartCoroutine(DeathRoutine());
+    }
+
+    IEnumerator DeathRoutine()
+    {
+        // 애니메이션 재생 대기
+        yield return new WaitForSeconds(1f);
+
+        // 페이드 아웃
+        Renderer[] renderers = GetComponentsInChildren<Renderer>();
+        float elapsed = 0f;
+        float fadeDuration = 1f;
+
+        // 머티리얼 인스턴스화 및 알파 설정
+        foreach (Renderer r in renderers)
+            foreach (Material m in r.materials)
+                m.SetFloat("_Surface", 1); // URP Transparent 모드
+
+        while (elapsed < fadeDuration)
+        {
+            elapsed += Time.deltaTime;
+            float alpha = 1f - (elapsed / fadeDuration);
+
+            foreach (Renderer r in renderers)
+                foreach (Material m in r.materials)
+                    m.color = new Color(m.color.r, m.color.g, m.color.b, alpha);
+
+            yield return null;
+        }
 
         Destroy(gameObject);
     }
