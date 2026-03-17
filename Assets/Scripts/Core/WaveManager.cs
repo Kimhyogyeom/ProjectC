@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.AI;
 
 /// <summary>
 /// 웨이브 스폰 매니저
@@ -70,11 +71,27 @@ public class WaveManager : MonoBehaviour
     #region Spawn
     void SpawnEnemy()
     {
-        // 플레이어 주변 랜덤 위치에 스폰
-        Vector2 randomCircle = UnityEngine.Random.insideUnitCircle.normalized * _spawnRadius;
-        Vector3 spawnPosition = _player.position + new Vector3(randomCircle.x, 0f, randomCircle.y);
-
+        Vector3 spawnPosition = GetValidSpawnPosition();
         Instantiate(_enemyPrefab, spawnPosition, Quaternion.identity);
+    }
+
+    Vector3 GetValidSpawnPosition()
+    {
+        // 최대 10번 시도, NavMesh 위 유효한 위치 찾기
+        for (int i = 0; i < 10; i++)
+        {
+            Vector2 randomCircle = UnityEngine.Random.insideUnitCircle.normalized * _spawnRadius;
+            Vector3 candidate = _player.position + new Vector3(randomCircle.x, 0f, randomCircle.y);
+
+            if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, 3f, NavMesh.AllAreas))
+                return hit.position;
+        }
+
+        // 10번 다 실패하면 플레이어 위치 근처에서 NavMesh 탐색
+        if (NavMesh.SamplePosition(_player.position, out NavMeshHit fallback, _spawnRadius, NavMesh.AllAreas))
+            return fallback.position;
+
+        return _player.position;
     }
     #endregion
 
