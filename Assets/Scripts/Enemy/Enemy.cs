@@ -21,6 +21,9 @@ public class Enemy : MonoBehaviour
     [SerializeField] float _attackCooldown = 1f;
     [SerializeField] float _knockbackDistance = 1.5f;
 
+    [Header("Drop")]
+    [SerializeField] GameObject _expOrbPrefab;      // 경험치 구슬 프리팹
+
     [Header("UI")]
     [SerializeField] Image _hpBarFill;
     #endregion
@@ -153,6 +156,10 @@ public class Enemy : MonoBehaviour
     #region Death
     void Die()
     {
+        // 경험치 구슬 스폰
+        if (_expOrbPrefab != null)
+            Instantiate(_expOrbPrefab, transform.position, Quaternion.identity);
+
         WaveManager waveManager = FindFirstObjectByType<WaveManager>();
         if (waveManager != null)
             waveManager.OnEnemyDied();
