@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,6 +19,7 @@ public class PlayerLevel : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] Image _expBarFill;
+    [SerializeField] TMP_Text _levelText;
     #endregion
 
     #region Private Fields
@@ -94,8 +96,11 @@ public class PlayerLevel : MonoBehaviour
         _debugCurrentExp = _currentExp;
         _debugExpRequired = _expRequired;
 
-        if (_expBarFill == null) return;
-        _expBarFill.fillAmount = (float)_currentExp / _expRequired;
+        if (_expBarFill != null)
+            _expBarFill.fillAmount = (float)_currentExp / _expRequired;
+
+        if (_levelText != null)
+            _levelText.text = $"Lv.{_currentLevel}";
     }
     #endregion
 }
