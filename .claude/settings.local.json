@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:assetstore.unity.com)",
+      "WebSearch",
+      "WebFetch(domain:www.explosive.ws)",
+      "WebFetch(domain:unityassetcollection.com)",
+      "WebFetch(domain:unityassetsstore.com)",
+      "WebFetch(domain:justcreate.artstation.com)"
+    ]
+  }
+}
