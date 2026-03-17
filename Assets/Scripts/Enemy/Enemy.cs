@@ -24,6 +24,7 @@ public class Enemy : MonoBehaviour
 
     [Header("Drop")]
     [SerializeField] GameObject _expOrbPrefab;      // 경험치 구슬 프리팹
+    [SerializeField] int _goldDrop = 5;             // 사망 시 지급 골드
 
     [Header("UI")]
     [SerializeField] Image _hpBarFill;
@@ -234,6 +235,10 @@ public class Enemy : MonoBehaviour
         // 경험치 구슬 스폰
         if (_expOrbPrefab != null)
             Instantiate(_expOrbPrefab, transform.position, Quaternion.identity);
+
+        // 골드 지급 (적 위치에서 UI로 날아감)
+        if (GoldManager.Instance != null)
+            GoldManager.Instance.AddGold(_goldDrop, transform.position);
 
         WaveManager waveManager = FindFirstObjectByType<WaveManager>();
         if (waveManager != null)
