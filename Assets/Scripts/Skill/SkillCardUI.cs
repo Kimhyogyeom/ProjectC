@@ -14,7 +14,7 @@ public class SkillCardUI : MonoBehaviour
     [SerializeField] TMP_Text _levelText;
     [SerializeField] TMP_Text _descriptionText;
     [SerializeField] Image _iconImage;
-    [SerializeField] Image _cardBackground;
+    [SerializeField] Image _cardAccent;                                      // 하단 컬러 바
     [SerializeField] Color _newSkillColor = new Color(0.2f, 0.6f, 1f);     // 새 스킬: 파란색
     [SerializeField] Color _upgradeColor = new Color(0.2f, 0.8f, 0.2f);    // 업그레이드: 초록색
     [SerializeField] Color _uniqueColor = new Color(1f, 0.8f, 0f);         // 유니크: 골드색
@@ -56,12 +56,12 @@ public class SkillCardUI : MonoBehaviour
         if (_iconImage != null && skillData.icon != null)
             _iconImage.sprite = skillData.icon;
 
-        // 카드 배경색
-        if (_cardBackground != null)
+        // 하단 컬러 바
+        if (_cardAccent != null)
         {
-            if (isUnique) _cardBackground.color = _uniqueColor;
-            else if (isNew) _cardBackground.color = _newSkillColor;
-            else _cardBackground.color = _upgradeColor;
+            if (isUnique) _cardAccent.color = _uniqueColor;
+            else if (isNew) _cardAccent.color = _newSkillColor;
+            else _cardAccent.color = _upgradeColor;
         }
     }
 
