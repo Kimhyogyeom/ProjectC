@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 /// <summary>
 /// 적 기본 클래스
@@ -142,6 +143,48 @@ public class Enemy : MonoBehaviour
 
         if (_currentHp <= 0)
             Die();
+    }
+
+    /// <summary>독 적용 (독 묻히기 스킬)</summary>
+    public void ApplyPoison(float damagePerSecond, float duration, bool isSpreading)
+    {
+        StartCoroutine(PoisonRoutine(damagePerSecond, duration, isSpreading));
+    }
+    #endregion
+
+    #region Poison
+    Coroutine _poisonCoroutine;
+
+    IEnumerator PoisonRoutine(float damagePerSecond, float duration, bool isSpreading)
+    {
+        float elapsed = 0f;
+        float tick = 1f;
+        float nextTick = tick;
+
+        while (elapsed < duration && _currentHp > 0)
+        {
+            elapsed += Time.deltaTime;
+
+            if (elapsed >= nextTick)
+            {
+                TakeDamage(Mathf.RoundToInt(damagePerSecond));
+                nextTick += tick;
+            }
+
+            yield return null;
+        }
+
+        // Lv5 전염: 주변 적에게 독 전파
+        if (isSpreading)
+        {
+            Collider[] nearby = Physics.OverlapSphere(transform.position, 2f);
+            foreach (Collider col in nearby)
+            {
+                Enemy nearEnemy = col.GetComponent<Enemy>();
+                if (nearEnemy != null && nearEnemy != this)
+                    nearEnemy.ApplyPoison(damagePerSecond, duration * 0.5f, false);
+            }
+        }
     }
     #endregion
 

@@ -27,6 +27,8 @@ public class PlayerHealth : MonoBehaviour
 
     #region Private Fields
     float _lastHitTime = -999f;
+    float _dodgeChance = 0f;        // 연막탄 회피 확률
+    bool _dodgeTeleport = false;    // 연막탄 Lv5: 회피 시 순간이동
     #endregion
 
     #region Unity Lifecycle
@@ -47,8 +49,14 @@ public class PlayerHealth : MonoBehaviour
     /// <summary>데미지를 받아 HP 감소, 0 이하 시 사망 처리 (무적 시간 중 무시)</summary>
     public void TakeDamage(int damage)
     {
-        // 캐싱값 대신 인라인 계산 (같은 프레임 다중 피격 방지)
         if (Time.time < _lastHitTime + _invincibleDuration) return;
+
+        // 연막탄 회피 판정
+        if (_dodgeChance > 0f && UnityEngine.Random.value < _dodgeChance)
+        {
+            if (_dodgeTeleport) TeleportDodge();
+            return;
+        }
 
         _lastHitTime = Time.time;
         _currentHp -= damage;
@@ -57,6 +65,13 @@ public class PlayerHealth : MonoBehaviour
 
         if (_currentHp <= 0)
             Die();
+    }
+
+    /// <summary>연막탄 설정 (SkillManager에서 호출)</summary>
+    public void SetDodgeChance(float chance, bool teleport)
+    {
+        _dodgeChance = chance;
+        _dodgeTeleport = teleport;
     }
     #endregion
 
@@ -72,6 +87,16 @@ public class PlayerHealth : MonoBehaviour
     /// <summary>플레이어 사망 시 호출</summary>
     public event Action OnPlayerDied;
     #endregion
+
+    /// <summary>연막탄 Lv5: 회피 시 랜덤 위치로 순간이동 + 무적</summary>
+    void TeleportDodge()
+    {
+        Vector3 randomOffset = new Vector3(
+            UnityEngine.Random.Range(-3f, 3f), 0f,
+            UnityEngine.Random.Range(-3f, 3f));
+        transform.position += randomOffset;
+        _lastHitTime = Time.time; // 무적 시간 적용
+    }
 
     #region Death
     void Die()

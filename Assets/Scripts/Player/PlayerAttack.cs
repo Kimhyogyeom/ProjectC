@@ -2,8 +2,10 @@ using UnityEngine;
 
 /// <summary>
 /// 플레이어 자동 공격 시스템
-/// - 멈추면 가장 가까운 적을 탐색하여 자동 발사
-/// - 이동 중에는 공격하지 않음 (Archero 방식)
+/// - 기본: 멈추면 가장 가까운 적에게 자동 발사 (Archero 방식)
+/// - 질풍 스킬: 이동 중 공격 가능
+/// - 다중 표창: 부채꼴로 N발 발사
+/// - 독 묻히기: 투사체에 독 효과 부여
 /// </summary>
 [RequireComponent(typeof(PlayerController))]
 public class PlayerAttack : MonoBehaviour
@@ -22,6 +24,16 @@ public class PlayerAttack : MonoBehaviour
     #region Private Fields
     PlayerController _playerController;
     float _lastAttackTime;
+
+    // 스킬 상태
+    int _multiShotCount = 1;            // 다중 표창 발사 수
+    bool _isShotPierce = false;         // 관통 여부 (다중 표창 Lv5)
+    bool _canAttackWhileMoving = false; // 질풍 스킬
+    bool _galeDoubleSpeed = false;      // 질풍 Lv5
+    bool _hasPoison = false;            // 독 묻히기
+    float _poisonDamage = 0f;
+    float _poisonDuration = 0f;
+    bool _isPoisonSpreading = false;
     #endregion
 
     #region Unity Lifecycle
@@ -32,37 +44,35 @@ public class PlayerAttack : MonoBehaviour
 
     void Update()
     {
-        // Archero 방식: 멈췄을 때만 공격
-        if (!_playerController.IsMoving)
+        bool isMoving = _playerController.IsMoving;
+
+        // 질풍 스킬 없으면 멈춰야 공격, 있으면 항상 공격
+        if (!isMoving || _canAttackWhileMoving)
         {
-            HandleAttack();
+            float cooldown = (_galeDoubleSpeed && isMoving) ? _attackCooldown * 0.5f : _attackCooldown;
+            HandleAttack(cooldown);
         }
     }
     #endregion
 
     #region Attack
-    void HandleAttack()
+    void HandleAttack(float cooldown)
     {
-        // 쿨다운 체크
-        if (Time.time - _lastAttackTime < _attackCooldown) return;
+        if (Time.time - _lastAttackTime < cooldown) return;
 
-        // 가장 가까운 적 탐색
         Transform target = FindClosestEnemy();
         if (target == null) return;
 
-        // 적 방향으로 회전
         Vector3 direction = (target.position - transform.position).normalized;
         direction.y = 0f;
         transform.rotation = Quaternion.LookRotation(direction);
 
-        // 표창 발사
-        FireProjectile(direction);
+        FireProjectiles(direction);
         _lastAttackTime = Time.time;
     }
 
     Transform FindClosestEnemy()
     {
-        // "Enemy" 태그가 달린 오브젝트 중 가장 가까운 적 탐색
         GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
 
         Transform closest = null;
@@ -81,18 +91,70 @@ public class PlayerAttack : MonoBehaviour
         return closest;
     }
 
-    void FireProjectile(Vector3 direction)
+    void FireProjectiles(Vector3 direction)
     {
         if (_projectilePrefab == null || _firePoint == null) return;
 
-        // 표창 생성 및 방향 설정
-        GameObject projectile = Instantiate(_projectilePrefab, _firePoint.position, Quaternion.LookRotation(direction));
-        Projectile proj = projectile.GetComponent<Projectile>();
-
-        if (proj != null)
+        if (_multiShotCount <= 1)
         {
-            proj.Init(direction, _projectileSpeed);
+            SpawnProjectile(_firePoint.position, direction, 1f, _isShotPierce);
         }
+        else
+        {
+            // 부채꼴로 N발 발사
+            float spreadAngle = 15f;
+            float totalAngle = spreadAngle * (_multiShotCount - 1);
+            float startAngle = -totalAngle / 2f;
+
+            for (int i = 0; i < _multiShotCount; i++)
+            {
+                float angle = startAngle + spreadAngle * i;
+                Vector3 spreadDir = Quaternion.Euler(0, angle, 0) * direction;
+                SpawnProjectile(_firePoint.position, spreadDir, 1f, _isShotPierce);
+            }
+        }
+
+        // 분신 발사
+        CloneAttack[] clones = GetComponentsInChildren<CloneAttack>();
+        foreach (CloneAttack clone in clones)
+            clone.FireInDirection(direction, _projectilePrefab, _projectileSpeed);
+    }
+
+    void SpawnProjectile(Vector3 position, Vector3 direction, float damageRatio, bool isPierce)
+    {
+        GameObject proj = Instantiate(_projectilePrefab, position, Quaternion.LookRotation(direction));
+        Projectile projectile = proj.GetComponent<Projectile>();
+        if (projectile == null) return;
+
+        projectile.Init(direction, _projectileSpeed, damageRatio, isPierce);
+
+        if (_hasPoison)
+            projectile.SetPoison(_poisonDamage, _poisonDuration, _isPoisonSpreading);
+    }
+    #endregion
+
+    #region Skill Setters (SkillManager에서 호출)
+    /// <summary>다중 표창 설정</summary>
+    public void SetMultiShot(int count, bool isPierce)
+    {
+        _multiShotCount = count;
+        _isShotPierce = isPierce;
+    }
+
+    /// <summary>독 묻히기 설정</summary>
+    public void SetPoison(float damage, float duration, bool isSpreading)
+    {
+        _hasPoison = true;
+        _poisonDamage = damage;
+        _poisonDuration = duration;
+        _isPoisonSpreading = isSpreading;
+    }
+
+    /// <summary>질풍 설정</summary>
+    public void SetCanAttackWhileMoving(bool canAttack, bool doubleSpeed)
+    {
+        _canAttackWhileMoving = canAttack;
+        _galeDoubleSpeed = doubleSpeed;
     }
     #endregion
 }

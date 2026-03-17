@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5df86a2d30b18724db1470e456416f5d, type: 3}
+  m_Name: SK_Gale
+  m_EditorClassIdentifier: 
+  skillType: 3
+  skillName: "\uC9C8\uD48D"
+  icon: {fileID: 0}
+  levelDescriptions:
+  - "\uC774\uB3D9\uC18D\uB3C4 + 10% + \uC774\uB3D9 \uC911 \uACF5\uACA9 \uAC00\uB2A5"
+  - "\uC774\uB3D9\uC18D\uB3C4 + 20%"
+  - "\uC774\uB3D9\uC18D\uB3C4 + 30%"
+  - "\uC774\uB3D9\uC18D\uB3C4 + 40%"
+  - "[UNIQUE] \uC774\uB3D9 \uC911 \uACF5\uACA9\uC18D\uB3C4 2\uBC30"
+  levelValues:
+  - 1.1
+  - 1.2
+  - 1.3
+  - 1.4
+  - 1.5

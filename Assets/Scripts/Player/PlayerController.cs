@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviour
     CharacterController _controller;
     Vector3 _moveDirection;
     bool _isMoving;
+    float _speedMultiplier = 1f;    // 질풍 스킬 배율
     #endregion
 
     #region Unity Lifecycle
@@ -47,7 +48,7 @@ public class PlayerController : MonoBehaviour
 
         if (_isMoving)
         {
-            _controller.Move(_moveDirection.normalized * _moveSpeed * Time.deltaTime);
+            _controller.Move(_moveDirection.normalized * _moveSpeed * _speedMultiplier * Time.deltaTime);
         }
     }
 
@@ -65,5 +66,11 @@ public class PlayerController : MonoBehaviour
     #region Public API
     /// <summary>현재 이동 중인지 여부 (PlayerAttack에서 사용)</summary>
     public bool IsMoving => _isMoving;
+
+    /// <summary>질풍 스킬: 이동속도 배율 설정</summary>
+    public void SetSpeedMultiplier(float multiplier)
+    {
+        _speedMultiplier = multiplier;
+    }
     #endregion
 }
