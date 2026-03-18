@@ -1,9 +1,10 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
 /// 회전 수리검 충돌 처리
 /// - 적에게 닿으면 데미지
-/// - 관통 여부에 따라 연속 히트 가능
+/// - 적별로 히트 쿨다운 관리 (다른 적은 즉시 히트 가능)
 /// </summary>
 public class SpinningStarHitbox : MonoBehaviour
 {
@@ -11,7 +12,7 @@ public class SpinningStarHitbox : MonoBehaviour
     int _damage;
     bool _isPierce;
     float _hitCooldown = 0.5f;
-    float _lastHitTime;
+    Dictionary<Enemy, float> _lastHitTimes = new Dictionary<Enemy, float>();
     #endregion
 
     #region Public API
@@ -26,14 +27,14 @@ public class SpinningStarHitbox : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Enemy")) return;
-        if (Time.time - _lastHitTime < _hitCooldown) return;
 
         Enemy enemy = other.GetComponent<Enemy>();
-        if (enemy != null)
-        {
-            enemy.TakeDamage(_damage);
-            _lastHitTime = Time.time;
-        }
+        if (enemy == null) return;
+
+        if (_lastHitTimes.TryGetValue(enemy, out float lastHit) && Time.time - lastHit < _hitCooldown) return;
+
+        enemy.TakeDamage(_damage);
+        _lastHitTimes[enemy] = Time.time;
     }
     #endregion
 }
