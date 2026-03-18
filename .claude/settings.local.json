@@ -6,7 +6,11 @@
       "WebFetch(domain:www.explosive.ws)",
       "WebFetch(domain:unityassetcollection.com)",
       "WebFetch(domain:unityassetsstore.com)",
-      "WebFetch(domain:justcreate.artstation.com)"
+      "WebFetch(domain:justcreate.artstation.com)",
+      "Bash(xargs head:*)",
+      "Bash(xargs wc:*)",
+      "Bash(du -sh \"/c/Unity_Project/ProjectC/Assets\"/*)",
+      "Bash(wc -l \"/c/Unity_Project/ProjectC/Assets/Scripts\"/**/*.cs)"
     ]
   }
 }
