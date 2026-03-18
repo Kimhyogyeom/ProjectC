@@ -12,6 +12,7 @@ public class GameOverUI : MonoBehaviour
     #region Serialized Fields
     [Header("References")]
     [SerializeField] PlayerHealth _playerHealth;
+    [SerializeField] PauseUI _pauseUI;
 
     [Header("UI")]
     [SerializeField] GameObject _gameOverPanel;
@@ -39,8 +40,15 @@ public class GameOverUI : MonoBehaviour
     #region Event Handlers
     void HandlePlayerDied()
     {
+        // 일시정지 중이면 먼저 해제
+        if (_pauseUI != null && _pauseUI.IsPaused)
+        {
+            // PauseUI 패널은 직접 닫아주고 게임오버로 전환
+            _pauseUI.ForceClose();
+        }
+
         _gameOverPanel.SetActive(true);
-        Time.timeScale = 0f; // 게임 일시정지
+        Time.timeScale = 0f;
     }
     #endregion
 

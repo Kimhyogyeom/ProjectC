@@ -10,7 +10,8 @@
       "Bash(xargs head:*)",
       "Bash(xargs wc:*)",
       "Bash(du -sh \"/c/Unity_Project/ProjectC/Assets\"/*)",
-      "Bash(wc -l \"/c/Unity_Project/ProjectC/Assets/Scripts\"/**/*.cs)"
+      "Bash(wc -l \"/c/Unity_Project/ProjectC/Assets/Scripts\"/**/*.cs)",
+      "Bash(git show:*)"
     ]
   }
 }
