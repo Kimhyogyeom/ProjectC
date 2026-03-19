@@ -22,6 +22,9 @@ public class Enemy : MonoBehaviour
     [SerializeField] float _attackCooldown = 1f;
     [SerializeField] float _knockbackDistance = 1.5f;
 
+    [Header("Wave Scaling")]
+    [SerializeField] float _scalePerWave = 0.01f;        // 웨이브당 스케일 증가량
+
     [Header("Drop")]
     [SerializeField] GameObject _expOrbPrefab;      // 경험치 구슬 프리팹
     [SerializeField] int _goldDrop = 5;             // 사망 시 지급 골드
@@ -53,6 +56,29 @@ public class Enemy : MonoBehaviour
         _agent.speed = _moveSpeed;
         _agent.stoppingDistance = _stopDistance;
         _agent.updateUpAxis = false;
+
+        UpdateHPBar();
+    }
+
+    /// <summary>웨이브 난이도에 따라 스탯 조정 (WaveManager에서 스폰 직후 호출)</summary>
+    public void ApplyWaveDifficulty(int wave)
+    {
+        // 웨이브 1은 기본값, 이후 점진적 강화
+        float hpMultiplier = 1f + (wave - 1) * 0.25f;       // 웨이브당 HP +25%
+        float dmgMultiplier = 1f + (wave - 1) * 0.15f;      // 웨이브당 데미지 +15%
+        float speedMultiplier = 1f + (wave - 1) * 0.05f;    // 웨이브당 이동속도 +5%
+
+        _maxHp = Mathf.RoundToInt(_maxHp * hpMultiplier);
+        _currentHp = _maxHp;
+        _damage = Mathf.RoundToInt(_damage * dmgMultiplier);
+        _moveSpeed *= speedMultiplier;
+
+        if (_agent != null)
+            _agent.speed = _moveSpeed;
+
+        // 웨이브마다 스케일 증가
+        float scaleMultiplier = 1f + (wave - 1) * _scalePerWave;
+        transform.localScale = Vector3.one * scaleMultiplier;
 
         UpdateHPBar();
     }

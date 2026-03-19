@@ -16,10 +16,10 @@ MonoBehaviour:
   skillName: "\uC5F0\uB9C9\uD0C4"
   icon: {fileID: 21300000, guid: b350a9035150e674189fe1b2e8957ea3, type: 3}
   levelDescriptions:
-  - "\uD53C\uACA9 \uC2DC 10% \uD655\uB960 \uD68C\uD53C"
   - "\uD53C\uACA9 \uC2DC 15% \uD655\uB960 \uD68C\uD53C"
-  - "\uD53C\uACA9 \uC2DC 20% \uD655\uB960 \uD68C\uD53C"
   - "\uD53C\uACA9 \uC2DC 25% \uD655\uB960 \uD68C\uD53C"
+  - "\uD53C\uACA9 \uC2DC 35% \uD655\uB960 \uD68C\uD53C"
+  - "\uD53C\uACA9 \uC2DC 45% \uD655\uB960 \uD68C\uD53C"
   - "[UNIQUE] \uD68C\uD53C \uC2DC \uC21C\uAC04\uC774\uB3D9 + \uBB34\uC801 0.5\uCD08"
   levelValues:
   - 0.15

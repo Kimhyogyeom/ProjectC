@@ -72,7 +72,12 @@ public class WaveManager : MonoBehaviour
     void SpawnEnemy()
     {
         Vector3 spawnPosition = GetValidSpawnPosition();
-        Instantiate(_enemyPrefab, spawnPosition, Quaternion.identity);
+        GameObject enemyObj = Instantiate(_enemyPrefab, spawnPosition, Quaternion.identity);
+
+        // 웨이브 난이도 적용
+        Enemy enemy = enemyObj.GetComponent<Enemy>();
+        if (enemy != null)
+            enemy.ApplyWaveDifficulty(_currentWave);
     }
 
     Vector3 GetValidSpawnPosition()
