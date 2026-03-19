@@ -17,6 +17,11 @@ public class WaveManager : MonoBehaviour
     [SerializeField] int _enemyIncreasePerWave = 2;  // 웨이브마다 증가하는 적 수
     [SerializeField] float _waveCooldown = 3f;        // 웨이브 사이 대기 시간
 
+    [Header("Boss Settings")]
+    [SerializeField] int _bossWaveInterval = 5;       // N웨이브마다 보스 등장
+    [SerializeField] string _bossName = "Dungeon Guardian";
+    [SerializeField] bool _debugBossFirstWave = false; // 테스트용: 1웨이브에 보스 즉시 등장
+
     [Header("Spawn Settings")]
     [SerializeField] GameObject _enemyPrefab;         // 적 프리팹
     [SerializeField] float _spawnRadius = 10f;        // 플레이어 기준 스폰 반경
@@ -40,17 +45,30 @@ public class WaveManager : MonoBehaviour
     void StartNextWave()
     {
         _currentWave++;
-        int spawnCount = _startEnemyCount + (_currentWave - 1) * _enemyIncreasePerWave;
+        bool isBossWave = _currentWave % _bossWaveInterval == 0 || (_debugBossFirstWave && _currentWave == 1);
 
-        Debug.Log($"[Wave] 웨이브 {_currentWave} 시작 - 적 {spawnCount}마리");
-        OnWaveStarted?.Invoke(_currentWave);
-
-        _aliveEnemyCount = spawnCount;
-        _isWaveActive = true;
-
-        for (int i = 0; i < spawnCount; i++)
+        if (isBossWave)
         {
-            SpawnEnemy();
+            Debug.Log($"[Wave] 웨이브 {_currentWave} - 보스 등장!");
+            OnWaveStarted?.Invoke(_currentWave);
+
+            _aliveEnemyCount = 1;
+            _isWaveActive = true;
+
+            SpawnBoss();
+        }
+        else
+        {
+            int spawnCount = _startEnemyCount + (_currentWave - 1) * _enemyIncreasePerWave;
+
+            Debug.Log($"[Wave] 웨이브 {_currentWave} 시작 - 적 {spawnCount}마리");
+            OnWaveStarted?.Invoke(_currentWave);
+
+            _aliveEnemyCount = spawnCount;
+            _isWaveActive = true;
+
+            for (int i = 0; i < spawnCount; i++)
+                SpawnEnemy();
         }
     }
 
@@ -78,6 +96,32 @@ public class WaveManager : MonoBehaviour
         Enemy enemy = enemyObj.GetComponent<Enemy>();
         if (enemy != null)
             enemy.ApplyWaveDifficulty(_currentWave);
+    }
+
+    void SpawnBoss()
+    {
+        Vector3 spawnPosition = GetValidSpawnPosition();
+        GameObject bossObj = Instantiate(_enemyPrefab, spawnPosition, Quaternion.identity);
+
+        Enemy enemy = bossObj.GetComponent<Enemy>();
+        if (enemy != null)
+        {
+            // 웨이브 난이도 먼저 적용, 그 위에 보스 배율
+            enemy.ApplyWaveDifficulty(_currentWave);
+
+            // 보스 HP바 연동
+            BossHPBar.Show(_bossName);
+            enemy.SetAsBoss(_currentWave, (ratio) =>
+            {
+                BossHPBar.UpdateHP(ratio);
+                if (ratio <= 0f)
+                    BossHPBar.Hide();
+            });
+
+            // 보스 패턴 추가
+            BossBehavior bossBehavior = bossObj.AddComponent<BossBehavior>();
+            bossBehavior.ApplyWaveDifficulty(_currentWave);
+        }
     }
 
     Vector3 GetValidSpawnPosition()
@@ -111,6 +155,9 @@ public class WaveManager : MonoBehaviour
 
     #region Public API
     public int CurrentWave => _currentWave;
+
+    /// <summary>해당 웨이브가 보스 웨이브인지 확인</summary>
+    public bool IsBossWave(int wave) => wave % _bossWaveInterval == 0 || (_debugBossFirstWave && wave == 1);
 
     /// <summary>웨이브 시작 시 호출 (wave 번호 전달)</summary>
     public event Action<int> OnWaveStarted;

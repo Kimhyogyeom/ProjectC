@@ -39,10 +39,12 @@ public class Enemy : MonoBehaviour
     float _attackTimer;
     bool _isKnockedBack;
     bool _isDead = false;
+    bool _isBoss = false;
     Coroutine _knockbackCoroutine;
     NavMeshAgent _agent;
     Collider _collider;
     Animator _animator;
+    System.Action<float> _onHpChanged;   // 보스 HP바 UI 연동용
     #endregion
 
     #region Unity Lifecycle
@@ -95,7 +97,7 @@ public class Enemy : MonoBehaviour
         if (0 < _attackTimer)
             _attackTimer -= Time.deltaTime;
 
-        if (!_isKnockedBack)
+        if (!_isKnockedBack && _agent.enabled && _agent.isOnNavMesh)
             _agent.SetDestination(_player.position);
 
         // 이동 애니메이션
@@ -176,6 +178,34 @@ public class Enemy : MonoBehaviour
 
     #region Public API
     public bool IsDead => _isDead;
+    public bool IsBoss => _isBoss;
+    public Transform Player => _player;
+
+    /// <summary>보스로 설정 (WaveManager에서 호출)</summary>
+    public void SetAsBoss(int wave, System.Action<float> onHpChanged)
+    {
+        _isBoss = true;
+        _onHpChanged = onHpChanged;
+
+        // 보스 스탯 배율 (웨이브 난이도 위에 추가 적용)
+        _maxHp = Mathf.RoundToInt(_maxHp * 10f);
+        _currentHp = _maxHp;
+        _damage = Mathf.RoundToInt(_damage * 2f);
+        _moveSpeed *= 0.7f;
+        _goldDrop *= 10;
+
+        if (_agent != null)
+            _agent.speed = _moveSpeed;
+
+        // 보스 스케일
+        transform.localScale *= 2.5f;
+
+        // 넉백 안 받게
+        _knockbackDistance = 0f;
+
+        UpdateHPBar();
+        _onHpChanged?.Invoke(1f);
+    }
 
     /// <summary>데미지를 받아 HP 감소, 0 이하 시 사망 처리</summary>
     public void TakeDamage(int damage)
@@ -280,7 +310,11 @@ public class Enemy : MonoBehaviour
     void UpdateHPBar()
     {
         if (_hpBarFill == null) return;
-        _hpBarFill.fillAmount = (float)_currentHp / _maxHp;
+        float ratio = (float)_currentHp / _maxHp;
+        _hpBarFill.fillAmount = ratio;
+
+        // 보스 HP바 UI 연동
+        _onHpChanged?.Invoke(ratio);
     }
     #endregion
 
