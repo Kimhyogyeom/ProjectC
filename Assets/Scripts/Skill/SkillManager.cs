@@ -1,5 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEngine.InputSystem;
+#endif
 
 /// <summary>
 /// 플레이어 스킬 보유 및 적용 관리
@@ -31,12 +34,33 @@ public class SkillManager : MonoBehaviour
         _playerHealth = GetComponent<PlayerHealth>();
         _playerLevel = GetComponent<PlayerLevel>();
     }
+
+    #if UNITY_EDITOR
+    void Update()
+    {
+        // 디버그: 숫자 키 1~7로 스킬 즉시 적용
+        Keyboard kb = Keyboard.current;
+        if (kb == null) return;
+        if (kb.digit1Key.wasPressedThisFrame) AcquireSkill(SkillType.MultiShuriken);
+        if (kb.digit2Key.wasPressedThisFrame) AcquireSkill(SkillType.PoisonBlade);
+        if (kb.digit3Key.wasPressedThisFrame) AcquireSkill(SkillType.ShadowClone);
+        if (kb.digit4Key.wasPressedThisFrame) AcquireSkill(SkillType.Gale);
+        if (kb.digit5Key.wasPressedThisFrame) AcquireSkill(SkillType.SmokeBomb);
+        if (kb.digit6Key.wasPressedThisFrame) AcquireSkill(SkillType.SpinningStar);
+        if (kb.digit7Key.wasPressedThisFrame) AcquireSkill(SkillType.Magnet);
+    }
+    #endif
     #endregion
 
     #region Public API
     /// <summary>스킬 획득 또는 레벨업 처리</summary>
     public void AcquireSkill(SkillType skillType)
     {
+        // 최대 레벨 체크
+        SkillData data = GetSkillData(skillType);
+        int currentLevel = GetSkillLevel(skillType);
+        if (data != null && currentLevel >= data.MaxLevel) return;
+
         if (_acquiredSkills.ContainsKey(skillType))
             _acquiredSkills[skillType]++;
         else
@@ -113,7 +137,7 @@ public class SkillManager : MonoBehaviour
     {
         if (_playerAttack == null) return;
         bool isPierce = level >= 5;
-        _playerAttack.SetMultiShot(level, isPierce);
+        _playerAttack.SetMultiShot(level + 1, isPierce);  // Lv1=2발, Lv2=3발 ...
     }
 
     // 독 묻히기: 투사체에 독 데미지 부여

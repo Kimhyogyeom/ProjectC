@@ -26,6 +26,16 @@ public class SpinningStarHitbox : MonoBehaviour
     #region Collision
     void OnTriggerEnter(Collider other)
     {
+        HandleHit(other);
+    }
+
+    void OnTriggerStay(Collider other)
+    {
+        HandleHit(other);
+    }
+
+    void HandleHit(Collider other)
+    {
         if (!other.CompareTag("Enemy")) return;
 
         Enemy enemy = other.GetComponent<Enemy>();
