@@ -20,6 +20,13 @@ public class WaveUI : MonoBehaviour
     [Header("Announcement Settings")]
     [SerializeField] float _displayDuration = 1.5f; // 알림 표시 시간
     [SerializeField] float _fadeDuration = 0.5f;    // 페이드아웃 시간
+
+    [Header("Announcement Text")]
+    [SerializeField] string _waveStartFormat = "Wave {0}";          // {0} = 웨이브 번호
+    [SerializeField] string _bossWaveFormat = "!! Wave {0} - BOSS !!";
+    [SerializeField] string _waveClearText = "Wave Clear!";
+    [SerializeField] Color _normalColor = Color.white;
+    [SerializeField] Color _bossColor = new Color(1f, 0.3f, 0.2f);
     #endregion
 
     #region Private Fields
@@ -52,33 +59,37 @@ public class WaveUI : MonoBehaviour
         if (_waveCounterText != null)
             _waveCounterText.text = $"Wave {wave}";
 
-        ShowAnnouncement($"Wave {wave} Start!");
+        bool isBossWave = _waveManager.IsBossWave(wave);
+        if (isBossWave)
+            ShowAnnouncement(string.Format(_bossWaveFormat, wave), _bossColor);
+        else
+            ShowAnnouncement(string.Format(_waveStartFormat, wave), _normalColor);
     }
 
     void HandleWaveCleared()
     {
-        ShowAnnouncement("Wave Clear!");
+        ShowAnnouncement(_waveClearText, _normalColor);
     }
     #endregion
 
     #region Announcement
-    void ShowAnnouncement(string message)
+    void ShowAnnouncement(string message, Color color = default)
     {
         if (_announcementText == null) return;
 
         if (_announcementCoroutine != null)
             StopCoroutine(_announcementCoroutine);
 
-        _announcementCoroutine = StartCoroutine(AnnouncementRoutine(message));
+        _announcementCoroutine = StartCoroutine(AnnouncementRoutine(message, color));
     }
 
-    IEnumerator AnnouncementRoutine(string message)
+    IEnumerator AnnouncementRoutine(string message, Color textColor)
     {
         _announcementText.text = message;
         _announcementText.gameObject.SetActive(true);
 
-        // 알림 유지
-        Color color = _announcementText.color;
+        // 색상 적용
+        Color color = textColor;
         color.a = 1f;
         _announcementText.color = color;
         yield return new WaitForSeconds(_displayDuration);
