@@ -22,8 +22,8 @@ MonoBehaviour:
   - "\uD53C\uACA9 \uC2DC 25% \uD655\uB960 \uD68C\uD53C"
   - "[UNIQUE] \uD68C\uD53C \uC2DC \uC21C\uAC04\uC774\uB3D9 + \uBB34\uC801 0.5\uCD08"
   levelValues:
-  - 0.1
   - 0.15
-  - 0.2
   - 0.25
-  - 0.3
+  - 0.35
+  - 0.45
+  - 0.55
