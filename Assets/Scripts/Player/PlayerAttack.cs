@@ -72,14 +72,20 @@ public class PlayerAttack : MonoBehaviour
         transform.rotation = targetRot;
 
         // 공격 애니메이션 (R1=4, R2=5, R3=6 랜덤)
+        int actionIndex = Random.Range(1, 7);
         if (_animator != null)
         {
             _animator.SetInteger("Weapon", 0);
             _animator.SetInteger("Jumping", 0);
             _animator.SetInteger("TriggerNumber", 4);
-            _animator.SetInteger("Action", Random.Range(1, 7));
+            _animator.SetInteger("Action", actionIndex);
             _animator.SetTrigger("Trigger");
         }
+
+        // 분신 공격 애니메이션 (약간 딜레이)
+        ShadowCloneSkill shadowClone = GetComponent<ShadowCloneSkill>();
+        if (shadowClone != null)
+            shadowClone.PlayAttackAnimation(actionIndex);
 
         StartCoroutine(FireWithDelay(direction, 0.2f));
         _lastAttackTime = Time.time;
@@ -88,6 +94,18 @@ public class PlayerAttack : MonoBehaviour
     IEnumerator FireWithDelay(Vector3 direction, float delay)
     {
         yield return new WaitForSeconds(delay);
+
+        // 이동 중이면 발사 시점에 적 방향 재계산
+        if (_canAttackWhileMoving && _playerController.IsMoving)
+        {
+            Transform target = FindClosestEnemy();
+            if (target != null)
+            {
+                direction = (target.position - transform.position).normalized;
+                direction.y = 0f;
+            }
+        }
+
         FireProjectiles(direction);
     }
 
@@ -139,9 +157,23 @@ public class PlayerAttack : MonoBehaviour
         }
 
         // 분신 발사
-        CloneAttack[] clones = GetComponentsInChildren<CloneAttack>();
-        foreach (CloneAttack clone in clones)
-            clone.FireInDirection(direction, _projectilePrefab, _projectileSpeed);
+        ShadowCloneSkill shadowClone = GetComponent<ShadowCloneSkill>();
+        if (shadowClone != null)
+        {
+            CloneAttack[] clones = shadowClone.GetCloneAttacks();
+            foreach (CloneAttack clone in clones)
+            {
+                if (clone == null) continue;
+                Vector3 cloneDir = direction;
+                Transform cloneTarget = FindClosestEnemy();
+                if (cloneTarget != null)
+                {
+                    cloneDir = (cloneTarget.position - clone.transform.position).normalized;
+                    cloneDir.y = 0f;
+                }
+                clone.FireInDirection(cloneDir, _projectilePrefab, _projectileSpeed);
+            }
+        }
     }
 
     void SpawnProjectile(Vector3 position, Vector3 direction, float damageRatio, bool isPierce)

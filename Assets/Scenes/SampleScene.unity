@@ -12452,6 +12452,8 @@ GameObject:
   - component: {fileID: 849863818}
   - component: {fileID: 849863819}
   - component: {fileID: 849863820}
+  - component: {fileID: 849863822}
+  - component: {fileID: 849863821}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -12668,6 +12670,37 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 94509d49d5850d943bbb84916cfae7bf, type: 2}
   - {fileID: 11400000, guid: df17e8fa72f97364480214317d7a38ed, type: 2}
   - {fileID: 11400000, guid: 5be0e4dea3e43244187ea3448a8527f4, type: 2}
+--- !u!114 &849863821
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849863809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 678f26b9bf06467499170df266e55730, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _starPrefab: {fileID: 9033449637366701456, guid: 35fde41653061ec47b74e46ff3f2fb58, type: 3}
+  _orbitRadius: 2
+  _rotationSpeed: 180
+  _damagePerHit: 5
+--- !u!114 &849863822
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849863809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43eeb1f075ecfc146a8f81c45fbd6815, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _followDelay: 0.15
+  _followDistance: 1.2
+  _shadowColor: {r: 0.05, g: 0.05, b: 0.1, a: 0.6}
 --- !u!1 &857235831
 GameObject:
   m_ObjectHideFlags: 0
@@ -12813,7 +12846,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: 47.072388}
+  m_AnchoredPosition: {x: 0, y: 47.07251}
   m_SizeDelta: {x: -49.3735, y: 78.2405}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &872618743

@@ -9,7 +9,7 @@ public class SpinningStarSkill : MonoBehaviour
 {
     #region Serialized Fields
     [SerializeField] GameObject _starPrefab;    // 수리검 프리팹 (Inspector에서 연결)
-    [SerializeField] float _orbitRadius = 1.2f;
+    [SerializeField] float _orbitRadius = 2.0f;
     [SerializeField] float _rotationSpeed = 180f;
     [SerializeField] int _damagePerHit = 5;
     #endregion
@@ -66,6 +66,10 @@ public class SpinningStarSkill : MonoBehaviour
         {
             _stars[i] = Instantiate(_starPrefab, transform.position, Quaternion.identity);
             _stars[i].transform.localScale = Vector3.one * sizeMultiplier;
+
+            // 프리팹에 Projectile이 있으면 제거 (표창 프리팹 재활용 시 자폭 방지)
+            Projectile proj = _stars[i].GetComponent<Projectile>();
+            if (proj != null) Destroy(proj);
 
             // 충돌 처리
             SpinningStarHitbox hitbox = _stars[i].AddComponent<SpinningStarHitbox>();
