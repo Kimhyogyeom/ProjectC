@@ -159,6 +159,12 @@ public class Enemy : MonoBehaviour
         _currentHp -= damage;
         UpdateHPBar();
 
+        // 데미지 숫자 팝업 (흰색)
+        DamagePopup.Create(transform.position + Vector3.up * 1.5f, damage.ToString(), Color.white);
+
+        // 피격 빨간 깜빡임
+        StartCoroutine(HitFlashRoutine());
+
         if (_currentHp <= 0)
             Die();
     }
@@ -185,7 +191,18 @@ public class Enemy : MonoBehaviour
 
             if (elapsed >= nextTick)
             {
-                TakeDamage(Mathf.RoundToInt(damagePerSecond));
+                int poisonDmg = Mathf.RoundToInt(damagePerSecond);
+                _currentHp -= poisonDmg;
+                UpdateHPBar();
+
+                // 독 데미지 팝업 (초록색)
+                DamagePopup.Create(transform.position + Vector3.up * 1.5f, poisonDmg.ToString(), new Color(0.2f, 0.9f, 0.2f));
+
+                if (_currentHp <= 0)
+                {
+                    Die();
+                    yield break;
+                }
                 nextTick += tick;
             }
 
@@ -203,6 +220,33 @@ public class Enemy : MonoBehaviour
                     nearEnemy.ApplyPoison(damagePerSecond, duration * 0.5f, false);
             }
         }
+    }
+    #endregion
+
+    #region Hit Flash
+    Renderer[] _cachedRenderers;
+    MaterialPropertyBlock _propBlock;
+
+    IEnumerator HitFlashRoutine()
+    {
+        // 캐싱 (최초 1회)
+        if (_cachedRenderers == null)
+        {
+            _cachedRenderers = GetComponentsInChildren<Renderer>();
+            _propBlock = new MaterialPropertyBlock();
+        }
+
+        // 빨간색 플래시 (MaterialPropertyBlock으로 머티리얼 인스턴스 안 만듦)
+        _propBlock.SetColor("_BaseColor", new Color(1f, 0.3f, 0.3f));
+        foreach (Renderer r in _cachedRenderers)
+            r.SetPropertyBlock(_propBlock);
+
+        yield return new WaitForSeconds(0.1f);
+
+        // 원래 색상 복원
+        _propBlock.Clear();
+        foreach (Renderer r in _cachedRenderers)
+            r.SetPropertyBlock(_propBlock);
     }
     #endregion
 
