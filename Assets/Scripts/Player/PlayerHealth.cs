@@ -62,6 +62,8 @@ public class PlayerHealth : MonoBehaviour
         // 연막탄 회피 판정
         if (_dodgeChance > 0f && UnityEngine.Random.value < _dodgeChance)
         {
+            // MISS 팝업 (회색)
+            DamagePopup.Create(transform.position + Vector3.up * 2f, "MISS", new Color(0.7f, 0.7f, 0.7f), 6f);
             if (_dodgeTeleport) TeleportDodge();
             return;
         }
@@ -70,6 +72,9 @@ public class PlayerHealth : MonoBehaviour
         _currentHp -= damage;
         _currentHp = Mathf.Max(_currentHp, 0);
         UpdateHPBar();
+
+        // 플레이어 피격 데미지 팝업 (빨간색)
+        DamagePopup.Create(transform.position + Vector3.up * 2f, damage.ToString(), new Color(1f, 0.3f, 0.3f), 6f);
 
         // 깜빡임 시작
         if (_flashCoroutine != null) StopCoroutine(_flashCoroutine);
