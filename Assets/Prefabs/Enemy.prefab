@@ -3799,6 +3799,7 @@ MonoBehaviour:
   _damage: 10
   _attackCooldown: 1
   _knockbackDistance: 1.5
+  _scalePerWave: 0.01
   _expOrbPrefab: {fileID: 372918106569519080, guid: 010946ae9d8cb664a8c0cf6c88943737, type: 3}
   _goldDrop: 5
   _hpBarFill: {fileID: 3904049788546181327}
