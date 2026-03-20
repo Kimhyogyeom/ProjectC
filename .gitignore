@@ -54,6 +54,9 @@ ExportedObj/
 *.unityproj
 .gradle/
 
+# TextMesh Pro (auto-modified by Unity)
+Assets/TextMesh Pro/Examples & Extras/Resources/Fonts & Materials/Bangers SDF.asset
+
 # Plastic SCM
 ignore.conf
 *.private.0

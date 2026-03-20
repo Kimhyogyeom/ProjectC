@@ -10,6 +10,8 @@ using UnityEngine;
 public class DamagePopup : MonoBehaviour
 {
     #region Pool
+    public static TMP_FontAsset SharedFont;
+
     static Queue<DamagePopup> _pool = new Queue<DamagePopup>();
     static Transform _poolParent;
     const int POOL_PRELOAD = 15;
@@ -38,6 +40,7 @@ public class DamagePopup : MonoBehaviour
         GameObject textObj = new GameObject("Text");
         textObj.transform.SetParent(popupObj.transform, false);
         TMP_Text tmpText = textObj.AddComponent<TextMeshPro>();
+        if (SharedFont != null) tmpText.font = SharedFont;
         tmpText.alignment = TextAlignmentOptions.Center;
         tmpText.fontStyle = FontStyles.Bold;
         popup._text = tmpText;

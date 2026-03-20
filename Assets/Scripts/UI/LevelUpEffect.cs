@@ -25,6 +25,7 @@ public class LevelUpEffect : MonoBehaviour
         GameObject textObj = new GameObject("LevelUpText");
         textObj.transform.SetParent(transform, false);
         TMP_Text tmpText = textObj.AddComponent<TextMeshPro>();
+        if (DamagePopup.SharedFont != null) tmpText.font = DamagePopup.SharedFont;
         tmpText.text = "LEVEL UP!";
         tmpText.fontSize = 7f;
         tmpText.alignment = TextAlignmentOptions.Center;
@@ -37,6 +38,7 @@ public class LevelUpEffect : MonoBehaviour
         lightObj.transform.localPosition = Vector3.down * 1.5f;
 
         ParticleSystem ps = lightObj.AddComponent<ParticleSystem>();
+        ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         var main = ps.main;
         main.duration = 0.5f;
         main.startLifetime = 0.6f;

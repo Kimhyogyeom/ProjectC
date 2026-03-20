@@ -3550,7 +3550,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _goldCoinFlyPrefab: {fileID: 7015882210120331219, guid: f8bda7c7b5ba5ad4288b2cb6fdd6da9f, type: 3}
-  _goldIconTarget: {fileID: 1290613606}
+  _goldIconTarget: {fileID: 642131363822694679}
   _canvas: {fileID: 699746019}
 --- !u!4 &186280589
 Transform:
