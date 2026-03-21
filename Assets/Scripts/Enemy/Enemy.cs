@@ -182,6 +182,7 @@ public class Enemy : MonoBehaviour
     public bool IsDead => _isDead;
     public bool IsBoss => _isBoss;
     public Transform Player => _player;
+    public int Damage => _damage;
 
     /// <summary>보스로 설정 (WaveManager에서 호출)</summary>
     public void SetAsBoss(int wave, System.Action<float> onHpChanged)
