@@ -3801,6 +3801,8 @@ MonoBehaviour:
   _knockbackDistance: 1.5
   _scalePerWave: 0.01
   _expOrbPrefab: {fileID: 372918106569519080, guid: 010946ae9d8cb664a8c0cf6c88943737, type: 3}
+  _healOrbPrefab: {fileID: 1387351438078185789, guid: 6eaa3aefb800a1e43a25b3b91fcebeeb, type: 3}
+  _healDropChance: 0.1
   _goldDrop: 5
   _hpBarFill: {fileID: 3904049788546181327}
 --- !u!195 &-1925905252767914380

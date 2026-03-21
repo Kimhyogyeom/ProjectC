@@ -27,6 +27,8 @@ public class Enemy : MonoBehaviour
 
     [Header("Drop")]
     [SerializeField] GameObject _expOrbPrefab;      // 경험치 구슬 프리팹
+    [SerializeField] GameObject _healOrbPrefab;     // HP 회복 아이템 프리팹
+    [SerializeField] float _healDropChance = 0.1f;  // 회복 아이템 드롭 확률 (10%)
     [SerializeField] int _goldDrop = 5;             // 사망 시 지급 골드
 
     [Header("UI")]
@@ -339,6 +341,10 @@ public class Enemy : MonoBehaviour
         // 경험치 구슬 스폰
         if (_expOrbPrefab != null)
             Instantiate(_expOrbPrefab, transform.position, Quaternion.identity);
+
+        // HP 회복 아이템 드롭 (10% 확률)
+        if (_healOrbPrefab != null && Random.value < _healDropChance)
+            Instantiate(_healOrbPrefab, transform.position + Vector3.up * 0.1f, Quaternion.identity);
 
         // 골드 지급 (적 위치에서 UI로 날아감)
         if (GoldManager.Instance != null)

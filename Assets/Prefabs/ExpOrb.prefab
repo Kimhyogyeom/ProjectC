@@ -122,6 +122,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _expAmount: 3
-  _moveSpeed: 5
+  _moveSpeed: 7
   _lifetime: 10
   _collectDistance: 0.3
