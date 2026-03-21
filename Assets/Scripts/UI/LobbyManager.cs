@@ -30,7 +30,7 @@ public class LobbyManager : MonoBehaviour
     [SerializeField] TMP_Text _goldText;
 
     [Header("UI - 하단 버튼")]
-    [SerializeField] Button _shopButton;
+    [SerializeField] Button _enhanceButton;
     [SerializeField] Button _gemShopButton;
     [SerializeField] Button _rewardButton;
     [SerializeField] Button _settingsButton;
@@ -39,6 +39,7 @@ public class LobbyManager : MonoBehaviour
     #region Private Fields
     int _currentIndex = 0;
     Coroutine _slideCoroutine;
+    Vector2 _cardCenterPos;
     #endregion
 
     #region Unity Lifecycle
@@ -48,7 +49,7 @@ public class LobbyManager : MonoBehaviour
         _rightButton.onClick.AddListener(OnRightClicked);
         _startButton.onClick.AddListener(OnStartClicked);
 
-        if (_shopButton != null) _shopButton.onClick.AddListener(OnShopClicked);
+        if (_enhanceButton != null) _enhanceButton.onClick.AddListener(OnEnhanceClicked);
         if (_gemShopButton != null) _gemShopButton.onClick.AddListener(OnGemShopClicked);
         if (_rewardButton != null) _rewardButton.onClick.AddListener(OnRewardClicked);
         if (_settingsButton != null) _settingsButton.onClick.AddListener(OnSettingsClicked);
@@ -57,6 +58,7 @@ public class LobbyManager : MonoBehaviour
     void Start()
     {
         if (AudioManager.Instance != null) AudioManager.Instance.PlayBgmLobby();
+        if (_stageCard != null) _cardCenterPos = _stageCard.anchoredPosition;
         UpdateUI();
         UpdateGoldUI();
     }
@@ -116,7 +118,10 @@ public class LobbyManager : MonoBehaviour
     {
         if (_stageCard == null) { UpdateUI(); yield break; }
 
-        Vector2 centerPos = _stageCard.anchoredPosition;
+        _leftButton.interactable = false;
+        _rightButton.interactable = false;
+
+        Vector2 centerPos = _cardCenterPos;
         Vector2 outPos = centerPos + new Vector2(-direction * _slideDistance, 0f);
         Vector2 inPos = centerPos + new Vector2(direction * _slideDistance, 0f);
         float elapsed = 0f;
@@ -145,6 +150,7 @@ public class LobbyManager : MonoBehaviour
         }
 
         _stageCard.anchoredPosition = centerPos;
+        UpdateUI();
     }
 
     void OnStartClicked()
@@ -153,10 +159,10 @@ public class LobbyManager : MonoBehaviour
         SceneTransition.Instance.LoadScene(_stages[_currentIndex].sceneName);
     }
 
-    void OnShopClicked()
+    void OnEnhanceClicked()
     {
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxButton();
-        // TODO: 상점 UI 열기
+        // TODO: 강화 UI 열기
     }
 
     void OnGemShopClicked()
