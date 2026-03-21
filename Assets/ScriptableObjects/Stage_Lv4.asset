@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0f26e4c93e11be24f9cabdb22e354c93, type: 3}
-  m_Name: Stage_InfiniteTower
+  m_Name: Stage_Lv4
   m_EditorClassIdentifier: 
-  stageName: Lv. 1
-  sceneName: GameScene
-  stageImage: {fileID: 21300000, guid: 645bea99460045a438defd1129e7ba0e, type: 3}
-  isLocked: 0
+  stageName: Lv. 4
+  sceneName: 
+  stageImage: {fileID: 21300000, guid: 5e3d73288ea74864ba34c0fe3902b670, type: 3}
+  isLocked: 1

@@ -25,7 +25,20 @@ public class SceneTransition : MonoBehaviour
 
     void Start()
     {
-        StartCoroutine(FadeIn());
+        StartCoroutine(InitialFadeIn());
+    }
+
+    IEnumerator InitialFadeIn()
+    {
+        // 즉시 검은 화면으로
+        Color c = _fadeImage.color;
+        c.a = 1f;
+        _fadeImage.color = c;
+
+        // 씬 완전 로드 대기
+        yield return new WaitForSecondsRealtime(_waitDuration);
+
+        yield return StartCoroutine(FadeIn());
     }
 
     /// <summary>페이드 아웃 후 씬 전환</summary>
