@@ -346,6 +346,8 @@ public class Enemy : MonoBehaviour
         if (_healOrbPrefab != null && Random.value < _healDropChance)
             Instantiate(_healOrbPrefab, transform.position + Vector3.up * 0.1f, Quaternion.identity);
 
+        if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxEnemyDie();
+
         // 골드 지급 (적 위치에서 UI로 날아감)
         if (GoldManager.Instance != null)
             GoldManager.Instance.AddGold(_goldDrop, transform.position);

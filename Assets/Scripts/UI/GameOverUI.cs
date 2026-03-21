@@ -49,12 +49,14 @@ public class GameOverUI : MonoBehaviour
 
         _gameOverPanel.SetActive(true);
         Time.timeScale = 0f;
+        if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxGameOver();
     }
     #endregion
 
     #region Button Callbacks
     void OnRetryClicked()
     {
+        if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxButton();
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }

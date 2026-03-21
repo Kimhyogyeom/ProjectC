@@ -73,6 +73,8 @@ public class PlayerHealth : MonoBehaviour
         _currentHp = Mathf.Max(_currentHp, 0);
         UpdateHPBar();
 
+        if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxPlayerHit();
+
         // 플레이어 피격 데미지 팝업 (빨간색)
         DamagePopup.Create(transform.position + Vector3.up * 2f, damage.ToString(), new Color(1f, 0.3f, 0.3f), 6f);
 
@@ -92,6 +94,7 @@ public class PlayerHealth : MonoBehaviour
         UpdateHPBar();
 
         DamagePopup.Create(transform.position + Vector3.up * 2f, $"+{amount}", new Color(0.3f, 1f, 0.4f), 6f);
+        if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxHeal();
     }
 
     /// <summary>연막탄 설정 (SkillManager에서 호출)</summary>

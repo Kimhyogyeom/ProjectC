@@ -47,6 +47,7 @@ public class Projectile : MonoBehaviour
         {
             int finalDamage = Mathf.RoundToInt(_damage * _damageRatio);
             enemy.TakeDamage(finalDamage);
+            if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxHit();
 
             // 독 적용
             if (_hasPoison)

@@ -137,6 +137,8 @@ public class PlayerAttack : MonoBehaviour
     {
         if (_projectilePrefab == null || _firePoint == null) return;
 
+        if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxShoot();
+
         if (_multiShotCount <= 1)
         {
             SpawnProjectile(_firePoint.position, direction, 1f, _isShotPierce);

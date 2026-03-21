@@ -99,6 +99,7 @@ public class SkillCardUI : MonoBehaviour
     /// <summary>카드 클릭 시 호출 (Button OnClick에 연결)</summary>
     public void OnCardClicked()
     {
+        if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxSkillSelect();
         _selectionUI.OnSkillSelected(_skillData.skillType);
     }
     #endregion

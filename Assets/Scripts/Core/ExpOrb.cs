@@ -71,6 +71,8 @@ public class ExpOrb : MonoBehaviour
         if (_playerLevel != null)
             _playerLevel.GainExp(_expAmount);
 
+        if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxExpOrb();
+
         Destroy(gameObject);
     }
     #endregion
