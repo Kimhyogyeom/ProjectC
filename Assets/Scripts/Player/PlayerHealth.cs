@@ -84,6 +84,16 @@ public class PlayerHealth : MonoBehaviour
             Die();
     }
 
+    /// <summary>최대 HP의 ratio만큼 회복</summary>
+    public void Heal(float ratio)
+    {
+        int amount = Mathf.RoundToInt(_maxHp * ratio);
+        _currentHp = Mathf.Min(_currentHp + amount, _maxHp);
+        UpdateHPBar();
+
+        DamagePopup.Create(transform.position + Vector3.up * 2f, $"+{amount}", new Color(0.3f, 1f, 0.4f), 6f);
+    }
+
     /// <summary>연막탄 설정 (SkillManager에서 호출)</summary>
     public void SetDodgeChance(float chance, bool teleport)
     {
