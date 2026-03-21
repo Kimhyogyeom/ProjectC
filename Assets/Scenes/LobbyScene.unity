@@ -314,7 +314,7 @@ MonoBehaviour:
   _slideDistance: 1000
   _slideDuration: 0.2
   _goldText: {fileID: 1989432929}
-  _shopButton: {fileID: 1561027959}
+  _enhanceButton: {fileID: 1561027959}
   _gemShopButton: {fileID: 1791300463}
   _rewardButton: {fileID: 164635233}
   _settingsButton: {fileID: 1264138747}
@@ -1498,7 +1498,7 @@ GameObject:
   - component: {fileID: 1561027959}
   - component: {fileID: 1561027960}
   m_Layer: 5
-  m_Name: ShopButton
+  m_Name: EnhanceButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
