@@ -37,6 +37,7 @@ public class WaveManager : MonoBehaviour
     #region Unity Lifecycle
     void Start()
     {
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayBgmGame();
         StartNextWave();
     }
     #endregion

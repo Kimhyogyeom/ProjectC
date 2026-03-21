@@ -27540,7 +27540,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &2093788228
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27579,6 +27579,7 @@ MonoBehaviour:
   _volGameOver: 0.5
   _sfxButton: {fileID: 8300000, guid: 43ed4390c0d857a46bd1befd437ad2d7, type: 3}
   _volButton: 0.5
+  _bgmLobby: {fileID: 0}
   _bgmMain: {fileID: 8300000, guid: 5943c252c4d593b4a89100b9b7e6b398, type: 3}
   _bgmVolume: 0.5
   _sfxVolume: 1
