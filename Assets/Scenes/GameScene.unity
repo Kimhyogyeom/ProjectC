@@ -11723,7 +11723,8 @@ MonoBehaviour:
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: f2dcf029949142e28b974630369c8b4e, type: 2}
-  m_fontSharedMaterials: []
+  m_fontSharedMaterials:
+  - {fileID: 2100000, guid: f2dcf029949142e28b974630369c8b4e, type: 2}
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
@@ -15165,7 +15166,10 @@ MonoBehaviour:
   _bossWaveInterval: 5
   _bossName: Guardian
   _debugBossFirstWave: 0
-  _enemyPrefab: {fileID: 9079415542656150256, guid: 93f074b96c23f3943b37a3eae504142b, type: 3}
+  _debugStartWave: 11
+  _skeletonPrefab: {fileID: 9079415542656150256, guid: 93f074b96c23f3943b37a3eae504142b, type: 3}
+  _batPrefab: {fileID: 9079415542656150256, guid: 499bf1cc01b2a0a4fbab73376523f64f, type: 3}
+  _slimePrefab: {fileID: 9079415542656150256, guid: 5f5a77a05af4e0f4fb85385ff3dbcbf4, type: 3}
   _spawnRadius: 20
   _player: {fileID: 849863815}
 --- !u!4 &990067267

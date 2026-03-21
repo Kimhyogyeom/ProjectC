@@ -21,9 +21,12 @@ public class WaveManager : MonoBehaviour
     [SerializeField] int _bossWaveInterval = 5;       // N웨이브마다 보스 등장
     [SerializeField] string _bossName = "Dungeon Guardian";
     [SerializeField] bool _debugBossFirstWave = false; // 테스트용: 1웨이브에 보스 즉시 등장
+    [SerializeField] int _debugStartWave = 1;          // 테스트용: 시작 웨이브 번호 (1 = 기본)
 
     [Header("Spawn Settings")]
-    [SerializeField] GameObject _enemyPrefab;         // 적 프리팹
+    [SerializeField] GameObject _skeletonPrefab;      // 해골 프리팹
+    [SerializeField] GameObject _batPrefab;           // 박쥐 프리팹 (웨이브 6+)
+    [SerializeField] GameObject _slimePrefab;         // 슬라임 프리팹 (웨이브 11+)
     [SerializeField] float _spawnRadius = 10f;        // 플레이어 기준 스폰 반경
     [SerializeField] Transform _player;               // 플레이어 트랜스폼
     #endregion
@@ -38,6 +41,8 @@ public class WaveManager : MonoBehaviour
     void Start()
     {
         if (AudioManager.Instance != null) AudioManager.Instance.PlayBgmGame();
+        if (_debugStartWave > 1)
+            _currentWave = _debugStartWave - 1;
         StartNextWave();
     }
     #endregion
@@ -91,8 +96,11 @@ public class WaveManager : MonoBehaviour
     #region Spawn
     void SpawnEnemy()
     {
+        GameObject prefab = GetEnemyPrefabForWave();
+        if (prefab == null) return;
+
         Vector3 spawnPosition = GetValidSpawnPosition();
-        GameObject enemyObj = Instantiate(_enemyPrefab, spawnPosition, Quaternion.identity);
+        GameObject enemyObj = Instantiate(prefab, spawnPosition, Quaternion.identity);
 
         // 웨이브 난이도 적용
         Enemy enemy = enemyObj.GetComponent<Enemy>();
@@ -100,10 +108,30 @@ public class WaveManager : MonoBehaviour
             enemy.ApplyWaveDifficulty(_currentWave);
     }
 
+    /// <summary>웨이브 번호에 따라 적 종류를 확률로 선택</summary>
+    GameObject GetEnemyPrefabForWave()
+    {
+        // 웨이브 1~4: 해골만
+        if (_currentWave < 6)
+            return _skeletonPrefab;
+
+        // 웨이브 6~10: 해골 70% / 박쥐 30%
+        if (_currentWave < 11)
+        {
+            return UnityEngine.Random.value < 0.7f ? _skeletonPrefab : _batPrefab;
+        }
+
+        // 웨이브 11+: 해골 40% / 박쥐 30% / 슬라임 30%
+        float roll = UnityEngine.Random.value;
+        if (roll < 0.4f) return _skeletonPrefab;
+        if (roll < 0.7f) return _batPrefab;
+        return _slimePrefab != null ? _slimePrefab : _skeletonPrefab;
+    }
+
     void SpawnBoss()
     {
         Vector3 spawnPosition = GetValidSpawnPosition();
-        GameObject bossObj = Instantiate(_enemyPrefab, spawnPosition, Quaternion.identity);
+        GameObject bossObj = Instantiate(_skeletonPrefab, spawnPosition, Quaternion.identity);
 
         Enemy enemy = bossObj.GetComponent<Enemy>();
         if (enemy != null)
