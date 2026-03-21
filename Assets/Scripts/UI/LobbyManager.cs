@@ -52,6 +52,7 @@ public class LobbyManager : MonoBehaviour
 
     void Start()
     {
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayBgmLobby();
         UpdateUI();
         UpdateGoldUI();
     }

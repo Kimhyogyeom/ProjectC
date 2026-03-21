@@ -45,6 +45,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField, Range(0f, 1f)] float _volButton = 1f;
 
     [Header("BGM")]
+    [SerializeField] AudioClip _bgmLobby;
     [SerializeField] AudioClip _bgmMain;
     [SerializeField, Range(0f, 1f)] float _bgmVolume = 0.5f;
 
@@ -129,6 +130,22 @@ public class AudioManager : MonoBehaviour
     {
         if (!_isSfxOn || clip == null) return;
         _sfxSource.PlayOneShot(clip, _sfxVolume * volume);
+    }
+
+    public void PlayBgmLobby()
+    {
+        if (_bgmLobby == null) return;
+        _bgmSource.clip = _bgmLobby;
+        _bgmSource.mute = !_isBgmOn;
+        _bgmSource.Play();
+    }
+
+    public void PlayBgmGame()
+    {
+        if (_bgmMain == null) return;
+        _bgmSource.clip = _bgmMain;
+        _bgmSource.mute = !_isBgmOn;
+        _bgmSource.Play();
     }
 
     void PlayBgm()
