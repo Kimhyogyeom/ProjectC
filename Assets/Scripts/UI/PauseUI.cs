@@ -68,6 +68,7 @@ public class PauseUI : MonoBehaviour
         if (_isPaused) return;
         if (Time.timeScale == 0f) return; // 스킬 선택, 게임오버 등 이미 정지 상태면 무시
 
+        if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxButton();
         _isPaused = true;
         _pausePanel.SetActive(true);
         Time.timeScale = 0f;
@@ -75,6 +76,7 @@ public class PauseUI : MonoBehaviour
 
     void OnResumeClicked()
     {
+        if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxButton();
         _isPaused = false;
         _pausePanel.SetActive(false);
         Time.timeScale = 1f;
@@ -82,6 +84,7 @@ public class PauseUI : MonoBehaviour
 
     void OnRestartClicked()
     {
+        if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxButton();
         _isPaused = false;
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
@@ -89,6 +92,7 @@ public class PauseUI : MonoBehaviour
 
     void OnLobbyClicked()
     {
+        if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxButton();
         _isPaused = false;
         Time.timeScale = 1f;
 

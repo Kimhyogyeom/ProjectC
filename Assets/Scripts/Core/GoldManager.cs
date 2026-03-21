@@ -37,6 +37,8 @@ public class GoldManager : MonoBehaviour
     /// <summary>골드 추가 + 코인 날리기</summary>
     public void AddGold(int amount, Vector3 worldPos)
     {
+        if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxCoin();
+
         if (_goldCoinFlyPrefab != null && _goldIconTarget != null && _canvas != null)
             StartCoroutine(SpawnFlyingCoins(amount, worldPos));
         else

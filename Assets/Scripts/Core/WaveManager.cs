@@ -81,6 +81,7 @@ public class WaveManager : MonoBehaviour
         {
             _isWaveActive = false;
             OnWaveCleared?.Invoke();
+            if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxWaveClear();
             StartCoroutine(NextWaveRoutine());
         }
     }
@@ -111,6 +112,7 @@ public class WaveManager : MonoBehaviour
 
             // 보스 HP바 연동
             BossHPBar.Show(_bossName);
+            if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxBoss();
             enemy.SetAsBoss(_currentWave, (ratio) =>
             {
                 BossHPBar.UpdateHP(ratio);
