@@ -17,6 +17,7 @@ public class GameOverUI : MonoBehaviour
     [Header("UI")]
     [SerializeField] GameObject _gameOverPanel;
     [SerializeField] Button _retryButton;
+    [SerializeField] Button _lobbyButton;
     #endregion
 
     #region Unity Lifecycle
@@ -24,6 +25,7 @@ public class GameOverUI : MonoBehaviour
     {
         _gameOverPanel.SetActive(false);
         _retryButton.onClick.AddListener(OnRetryClicked);
+        if (_lobbyButton != null) _lobbyButton.onClick.AddListener(OnLobbyClicked);
     }
 
     void OnEnable()
@@ -59,6 +61,14 @@ public class GameOverUI : MonoBehaviour
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxButton();
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    void OnLobbyClicked()
+    {
+        if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxButton();
+        if (GoldManager.Instance != null) GoldManager.Instance.SaveSessionGold();
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("LobbyScene");
     }
     #endregion
 }

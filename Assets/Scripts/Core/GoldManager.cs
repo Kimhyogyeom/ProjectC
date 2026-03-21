@@ -19,7 +19,8 @@ public class GoldManager : MonoBehaviour
     #endregion
 
     #region Private Fields
-    int _gold = 0;
+    int _gold = 0;          // 인게임 세션 골드 (매판 초기화)
+    static int _totalGold = 0;  // 누적 골드 (앱 실행 중 유지)
     #endregion
 
     #region Unity Lifecycle
@@ -32,7 +33,14 @@ public class GoldManager : MonoBehaviour
 
     #region Public API
     public int Gold => _gold;
+    public static int TotalGold => _totalGold;
     public event Action<int> OnGoldChanged;
+
+    /// <summary>로비로 나갈 때 호출 — 인게임 골드를 누적 골드에 더함</summary>
+    public void SaveSessionGold()
+    {
+        _totalGold += _gold;
+    }
 
     /// <summary>골드 추가 + 코인 날리기</summary>
     public void AddGold(int amount, Vector3 worldPos)
