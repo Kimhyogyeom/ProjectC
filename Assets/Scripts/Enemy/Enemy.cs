@@ -342,9 +342,13 @@ public class Enemy : MonoBehaviour
         if (_expOrbPrefab != null)
             Instantiate(_expOrbPrefab, transform.position, Quaternion.identity);
 
-        // HP 회복 아이템 드롭 (10% 확률)
+        // HP 회복 아이템 드롭 (10% 확률) — 경험치 구슬과 겹치지 않게 랜덤 오프셋
         if (_healOrbPrefab != null && Random.value < _healDropChance)
-            Instantiate(_healOrbPrefab, transform.position + Vector3.up * 0.1f, Quaternion.identity);
+        {
+            Vector2 offset = Random.insideUnitCircle.normalized * 0.8f;
+            Vector3 healPos = transform.position + new Vector3(offset.x, 0.1f, offset.y);
+            Instantiate(_healOrbPrefab, healPos, Quaternion.identity);
+        }
 
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxEnemyDie();
 
