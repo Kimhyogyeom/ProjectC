@@ -87,7 +87,7 @@ public class PauseUI : MonoBehaviour
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxButton();
         _isPaused = false;
         Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        SceneTransition.Instance.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     void OnLobbyClicked()
@@ -96,7 +96,7 @@ public class PauseUI : MonoBehaviour
         if (GoldManager.Instance != null) GoldManager.Instance.SaveSessionGold();
         _isPaused = false;
         Time.timeScale = 1f;
-        SceneManager.LoadScene("LobbyScene");
+        SceneTransition.Instance.LoadScene("LobbyScene");
     }
     #endregion
 
