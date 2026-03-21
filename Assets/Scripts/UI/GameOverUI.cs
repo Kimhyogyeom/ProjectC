@@ -60,7 +60,7 @@ public class GameOverUI : MonoBehaviour
     {
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxButton();
         Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        SceneTransition.Instance.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     void OnLobbyClicked()
@@ -68,7 +68,7 @@ public class GameOverUI : MonoBehaviour
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxButton();
         if (GoldManager.Instance != null) GoldManager.Instance.SaveSessionGold();
         Time.timeScale = 1f;
-        SceneManager.LoadScene("LobbyScene");
+        SceneTransition.Instance.LoadScene("LobbyScene");
     }
     #endregion
 }

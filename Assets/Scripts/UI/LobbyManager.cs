@@ -105,7 +105,7 @@ public class LobbyManager : MonoBehaviour
     void OnStartClicked()
     {
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxButton();
-        SceneManager.LoadScene(_stages[_currentIndex].sceneName);
+        SceneTransition.Instance.LoadScene(_stages[_currentIndex].sceneName);
     }
 
     void OnShopClicked()
