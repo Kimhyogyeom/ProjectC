@@ -93,14 +93,10 @@ public class PauseUI : MonoBehaviour
     void OnLobbyClicked()
     {
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxButton();
+        if (GoldManager.Instance != null) GoldManager.Instance.SaveSessionGold();
         _isPaused = false;
         Time.timeScale = 1f;
-
-        // TODO: 로비 씬 추가 후 아래 주석 해제
-        // SceneManager.LoadScene("Lobby");
-
-        // 임시: 현재 씬 재로드
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        SceneManager.LoadScene("LobbyScene");
     }
     #endregion
 
