@@ -9,6 +9,10 @@ using UnityEngine.AI;
 /// </summary>
 public class BossBehavior : MonoBehaviour
 {
+    #region Serialized Fields
+    [SerializeField] Material _warningMaterial;  // 반투명 빨간 머티리얼
+    #endregion
+
     #region Settings
     float _chargeCooldown = 6f;
     float _chargeSpeed = 10f;
@@ -45,7 +49,11 @@ public class BossBehavior : MonoBehaviour
     {
         _enemy = GetComponent<Enemy>();
         _agent = GetComponent<NavMeshAgent>();
-        _player = _enemy.Player;
+
+        // Enemy.Start()보다 먼저 실행될 수 있으므로 직접 탐색
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null) _player = playerObj.transform;
+
         _renderers = GetComponentsInChildren<Renderer>();
         _propBlock = new MaterialPropertyBlock();
 
@@ -63,7 +71,11 @@ public class BossBehavior : MonoBehaviour
     void Update()
     {
         if (_enemy.IsDead || _player == null || _isActing) return;
-        if (_agent == null || !_agent.isOnNavMesh) return;
+        if (_agent == null || !_agent.isOnNavMesh)
+        {
+            Debug.LogWarning($"[Boss] NavMesh 없음 - agent={_agent != null}, onNavMesh={_agent?.isOnNavMesh}");
+            return;
+        }
 
         _chargeTimer -= Time.deltaTime;
         _shockwaveTimer -= Time.deltaTime;
@@ -74,6 +86,7 @@ public class BossBehavior : MonoBehaviour
         // 돌진 (거리 10 이내)
         if (_chargeTimer <= 0f && dist < 10f)
         {
+            Debug.Log("[Boss] 돌진 시작");
             StartCoroutine(ChargeRoutine());
             _chargeTimer = _chargeCooldown;
             return;
@@ -82,6 +95,7 @@ public class BossBehavior : MonoBehaviour
         // 충격파 (거리 7 이내)
         if (_shockwaveTimer <= 0f && dist < 7f)
         {
+            Debug.Log("[Boss] 충격파 시작");
             StartCoroutine(ShockwaveRoutine());
             _shockwaveTimer = _shockwaveCooldown;
             return;
@@ -90,6 +104,7 @@ public class BossBehavior : MonoBehaviour
         // 바닥 폭격 (거리 무관, 원거리에서도 사용)
         if (_meteorTimer <= 0f)
         {
+            Debug.Log("[Boss] 바닥폭격 시작");
             StartCoroutine(MeteorRoutine());
             _meteorTimer = _meteorCooldown;
         }
@@ -280,20 +295,10 @@ public class BossBehavior : MonoBehaviour
         Collider col = obj.GetComponent<Collider>();
         if (col != null) Destroy(col);
 
-        // 반투명 머티리얼 설정
+        // 머티리얼 적용
         Renderer renderer = obj.GetComponent<Renderer>();
-        if (renderer != null)
-        {
-            Material mat = renderer.material;
-            mat.SetFloat("_Surface", 1);
-            mat.SetOverrideTag("RenderType", "Transparent");
-            mat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-            mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            mat.SetInt("_ZWrite", 0);
-            mat.renderQueue = 3000;
-            mat.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
-            mat.color = new Color(1f, 0.1f, 0.1f, 0f);
-        }
+        if (renderer != null && _warningMaterial != null)
+            renderer.material = new Material(_warningMaterial);
 
         return obj;
     }
@@ -411,6 +416,8 @@ public class BossBehavior : MonoBehaviour
     #endregion
 
     #region Public API
+    public void SetWarningMaterial(Material mat) => _warningMaterial = mat;
+
     public void ApplyWaveDifficulty(int wave)
     {
         float multiplier = 1f + (wave / 5 - 1) * 0.3f;

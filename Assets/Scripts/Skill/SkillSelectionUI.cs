@@ -19,6 +19,7 @@ public class SkillSelectionUI : MonoBehaviour
     #region Private Fields
     SkillManager _skillManager;
     bool _isAnimating;
+    System.Action _onCompleted;
     #endregion
 
     #region Unity Lifecycle
@@ -29,10 +30,11 @@ public class SkillSelectionUI : MonoBehaviour
     #endregion
 
     #region Public API
-    /// <summary>스킬 선택 UI 표시 (PlayerLevel에서 호출)</summary>
-    public void Show(SkillManager skillManager)
+    /// <summary>스킬 선택 UI 표시 (PlayerLevel 또는 WaveManager에서 호출)</summary>
+    public void Show(SkillManager skillManager, System.Action onCompleted = null)
     {
         _skillManager = skillManager;
+        _onCompleted = onCompleted;
 
         List<SkillData> choices = skillManager.GetRandomSkillChoices(3);
 
@@ -70,6 +72,8 @@ public class SkillSelectionUI : MonoBehaviour
         _skillManager.AcquireSkill(skillType);
         _panel.SetActive(false);
         Time.timeScale = 1f;    // 게임 재개
+        _onCompleted?.Invoke();
+        _onCompleted = null;
     }
     #endregion
 

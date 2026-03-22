@@ -13317,7 +13317,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: 47.07251}
+  m_AnchoredPosition: {x: 0, y: 47.072266}
   m_SizeDelta: {x: -49.3735, y: 78.2405}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &872618743
@@ -15166,12 +15166,15 @@ MonoBehaviour:
   _bossWaveInterval: 5
   _bossName: Guardian
   _debugBossFirstWave: 0
-  _debugStartWave: 11
+  _debugStartWave: 1
   _skeletonPrefab: {fileID: 9079415542656150256, guid: 93f074b96c23f3943b37a3eae504142b, type: 3}
   _batPrefab: {fileID: 9079415542656150256, guid: 499bf1cc01b2a0a4fbab73376523f64f, type: 3}
   _slimePrefab: {fileID: 9079415542656150256, guid: 5f5a77a05af4e0f4fb85385ff3dbcbf4, type: 3}
   _spawnRadius: 20
   _player: {fileID: 849863815}
+  _skillSelectionUI: {fileID: 2044054345}
+  _skillManager: {fileID: 849863820}
+  _bossWarningMaterial: {fileID: 2100000, guid: 6b80b699779504948919c701ca90b427, type: 2}
 --- !u!4 &990067267
 Transform:
   m_ObjectHideFlags: 0
