@@ -184,6 +184,12 @@ public class LobbyManager : MonoBehaviour
         // TODO: 보석 상점 UI 열기
     }
 
+    void OnSettingsClicked()
+    {
+        if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxButton();
+        // TODO: 설정 UI 열기
+    }
+
     void OnRewardClicked()
     {
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxButton();
@@ -197,10 +203,5 @@ public class LobbyManager : MonoBehaviour
         UpdateBonusCardUI();
     }
 
-    void OnSettingsClicked()
-    {
-        if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxButton();
-        // TODO: 설정 UI 열기
-    }
     #endregion
 }

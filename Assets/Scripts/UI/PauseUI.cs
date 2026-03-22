@@ -44,9 +44,9 @@ public class PauseUI : MonoBehaviour
 
     void Start()
     {
-        // 저장된 설정 불러오기 (AudioManager.Awake 이후 실행 보장)
-        _bgmToggle.isOn = AudioManager.Instance.IsBgmOn;
-        _sfxToggle.isOn = AudioManager.Instance.IsSfxOn;
+        // 저장된 설정 불러오기 (이벤트 발생 없이 값만 세팅)
+        _bgmToggle.SetIsOnWithoutNotify(AudioManager.Instance.IsBgmOn);
+        _sfxToggle.SetIsOnWithoutNotify(AudioManager.Instance.IsSfxOn);
     }
     #endregion
 
