@@ -47,6 +47,8 @@ public class Enemy : MonoBehaviour
     Collider _collider;
     Animator _animator;
     System.Action<float> _onHpChanged;   // 보스 HP바 UI 연동용
+    bool _hasMovingParam;
+    bool _hasVelocityParam;
     #endregion
 
     #region Unity Lifecycle
@@ -60,6 +62,16 @@ public class Enemy : MonoBehaviour
         _agent.speed = _moveSpeed;
         _agent.stoppingDistance = _stopDistance;
         _agent.updateUpAxis = false;
+
+        // 애니메이터 파라미터 존재 여부 캐싱
+        if (_animator != null)
+        {
+            foreach (var param in _animator.parameters)
+            {
+                if (param.name == "Moving") _hasMovingParam = true;
+                if (param.name == "Velocity X" || param.name == "Velocity Z") _hasVelocityParam = true;
+            }
+        }
 
         UpdateHPBar();
     }
@@ -106,10 +118,14 @@ public class Enemy : MonoBehaviour
         if (_animator != null)
         {
             bool isMoving = _agent.velocity.sqrMagnitude > 0.1f;
-            _animator.SetBool("Moving", isMoving);
-            Vector3 localVel = transform.InverseTransformDirection(_agent.velocity.normalized);
-            _animator.SetFloat("Velocity X", localVel.x);
-            _animator.SetFloat("Velocity Z", localVel.z);
+            if (_hasMovingParam)
+                _animator.SetBool("Moving", isMoving);
+            if (_hasVelocityParam)
+            {
+                Vector3 localVel = transform.InverseTransformDirection(_agent.velocity.normalized);
+                _animator.SetFloat("Velocity X", localVel.x);
+                _animator.SetFloat("Velocity Z", localVel.z);
+            }
         }
     }
     #endregion

@@ -29,6 +29,9 @@ public class LobbyManager : MonoBehaviour
     [Header("UI - 골드")]
     [SerializeField] TMP_Text _goldText;
 
+    [Header("UI - 보너스 카드")]
+    [SerializeField] GameObject _bonusCardIndicator;  // Start 버튼 위 Card+1 표시
+
     [Header("UI - 하단 버튼")]
     [SerializeField] Button _enhanceButton;
     [SerializeField] Button _gemShopButton;
@@ -61,6 +64,7 @@ public class LobbyManager : MonoBehaviour
         if (_stageCard != null) _cardCenterPos = _stageCard.anchoredPosition;
         UpdateUI();
         UpdateGoldUI();
+        UpdateBonusCardUI();
     }
     #endregion
 
@@ -69,6 +73,15 @@ public class LobbyManager : MonoBehaviour
     {
         if (_goldText == null) return;
         _goldText.text = GoldManager.TotalGold.ToString("N0");
+    }
+
+    void UpdateBonusCardUI()
+    {
+        bool hasBonusCard = GameSessionData.HasBonusSkillCard;
+        if (_bonusCardIndicator != null)
+            _bonusCardIndicator.SetActive(hasBonusCard);
+        if (_rewardButton != null)
+            _rewardButton.interactable = !hasBonusCard;
     }
 
     void UpdateUI()
@@ -174,7 +187,14 @@ public class LobbyManager : MonoBehaviour
     void OnRewardClicked()
     {
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxButton();
-        // TODO: 광고 보상 UI 열기
+        if (AdsManager.Instance != null)
+            AdsManager.Instance.ShowRewardedAd(OnRewardGranted);
+    }
+
+    void OnRewardGranted()
+    {
+        GameSessionData.HasBonusSkillCard = true;
+        UpdateBonusCardUI();
     }
 
     void OnSettingsClicked()

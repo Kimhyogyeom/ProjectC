@@ -29,6 +29,13 @@ public class WaveManager : MonoBehaviour
     [SerializeField] GameObject _slimePrefab;         // 슬라임 프리팹 (웨이브 11+)
     [SerializeField] float _spawnRadius = 10f;        // 플레이어 기준 스폰 반경
     [SerializeField] Transform _player;               // 플레이어 트랜스폼
+
+    [Header("Bonus Card")]
+    [SerializeField] SkillSelectionUI _skillSelectionUI;
+    [SerializeField] SkillManager _skillManager;
+
+    [Header("Boss")]
+    [SerializeField] Material _bossWarningMaterial;
     #endregion
 
     #region Private Fields
@@ -43,7 +50,25 @@ public class WaveManager : MonoBehaviour
         if (AudioManager.Instance != null) AudioManager.Instance.PlayBgmGame();
         if (_debugStartWave > 1)
             _currentWave = _debugStartWave - 1;
-        StartNextWave();
+
+        if (GameSessionData.HasBonusSkillCard && _skillSelectionUI != null && _skillManager != null)
+        {
+            // 페이드 인 완료 대기 후 보너스 카드 표시
+            StartCoroutine(ShowBonusCardRoutine());
+        }
+        else
+        {
+            StartNextWave();
+        }
+    }
+
+    IEnumerator ShowBonusCardRoutine()
+    {
+        // SceneTransition 페이드 인 완료까지 대기 (waitDuration 2초 + fadeDuration 0.4초)
+        yield return new WaitForSecondsRealtime(2.5f);
+
+        GameSessionData.HasBonusSkillCard = false;
+        _skillSelectionUI.Show(_skillManager, StartNextWave);
     }
     #endregion
 
@@ -151,6 +176,7 @@ public class WaveManager : MonoBehaviour
 
             // 보스 패턴 추가
             BossBehavior bossBehavior = bossObj.AddComponent<BossBehavior>();
+            bossBehavior.SetWarningMaterial(_bossWarningMaterial);
             bossBehavior.ApplyWaveDifficulty(_currentWave);
         }
     }

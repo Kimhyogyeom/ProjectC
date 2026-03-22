@@ -47,7 +47,8 @@ public class AudioManager : MonoBehaviour
     [Header("BGM")]
     [SerializeField] AudioClip _bgmLobby;
     [SerializeField] AudioClip _bgmMain;
-    [SerializeField, Range(0f, 1f)] float _bgmVolume = 0.5f;
+    [SerializeField, Range(0f, 1f)] float _bgmVolumeLobby = 0.5f;
+    [SerializeField, Range(0f, 1f)] float _bgmVolumeGame = 0.5f;
 
     [Header("SFX Volume")]
     [SerializeField, Range(0f, 1f)] float _sfxVolume = 1f;
@@ -81,7 +82,6 @@ public class AudioManager : MonoBehaviour
         _bgmSource = gameObject.AddComponent<AudioSource>();
         _bgmSource.playOnAwake = false;
         _bgmSource.loop = true;
-        _bgmSource.volume = _bgmVolume;
     }
 
     void Start()
@@ -136,6 +136,7 @@ public class AudioManager : MonoBehaviour
     {
         if (_bgmLobby == null) return;
         _bgmSource.clip = _bgmLobby;
+        _bgmSource.volume = _bgmVolumeLobby;
         _bgmSource.mute = !_isBgmOn;
         _bgmSource.Play();
     }
@@ -144,6 +145,7 @@ public class AudioManager : MonoBehaviour
     {
         if (_bgmMain == null) return;
         _bgmSource.clip = _bgmMain;
+        _bgmSource.volume = _bgmVolumeGame;
         _bgmSource.mute = !_isBgmOn;
         _bgmSource.Play();
     }
@@ -152,6 +154,7 @@ public class AudioManager : MonoBehaviour
     {
         if (_bgmMain == null) return;
         _bgmSource.clip = _bgmMain;
+        _bgmSource.volume = _bgmVolumeGame;
         _bgmSource.mute = !_isBgmOn;
         _bgmSource.Play();
     }
