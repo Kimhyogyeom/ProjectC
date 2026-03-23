@@ -18,6 +18,7 @@ public class Projectile : MonoBehaviour
     Vector3 _direction;
     float _speed;
     float _damageRatio = 1f;    // 분신 데미지 배율
+    bool _initialized = false;
     bool _isPierce = false;     // 관통 여부
     bool _hasPoison = false;    // 독 여부
     float _poisonDamage = 0f;
@@ -67,6 +68,12 @@ public class Projectile : MonoBehaviour
         _speed = speed;
         _damageRatio = damageRatio;
         _isPierce = isPierce;
+
+        if (!_initialized)
+        {
+            _damage += UpgradeManager.GetBonusDamage();
+            _initialized = true;
+        }
 
         Destroy(gameObject, _lifeTime);
     }

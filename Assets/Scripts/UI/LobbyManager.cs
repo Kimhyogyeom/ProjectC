@@ -37,6 +37,9 @@ public class LobbyManager : MonoBehaviour
     [SerializeField] Button _gemShopButton;
     [SerializeField] Button _rewardButton;
     [SerializeField] Button _settingsButton;
+
+    [Header("UI - 강화")]
+    [SerializeField] EnhanceUI _enhanceUI;
     #endregion
 
     #region Private Fields
@@ -175,7 +178,7 @@ public class LobbyManager : MonoBehaviour
     void OnEnhanceClicked()
     {
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxButton();
-        // TODO: 강화 UI 열기
+        if (_enhanceUI != null) _enhanceUI.Open();
     }
 
     void OnGemShopClicked()

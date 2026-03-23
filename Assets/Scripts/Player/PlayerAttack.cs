@@ -43,6 +43,7 @@ public class PlayerAttack : MonoBehaviour
     {
         _playerController = GetComponent<PlayerController>();
         _animator = GetComponentInChildren<Animator>();
+        _attackCooldown = Mathf.Max(0.1f, _attackCooldown - UpgradeManager.GetBonusAttackSpeed());
     }
 
     void Update()
