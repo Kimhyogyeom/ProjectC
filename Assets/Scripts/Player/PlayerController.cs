@@ -30,6 +30,7 @@ public class PlayerController : MonoBehaviour
     {
         _controller = GetComponent<CharacterController>();
         _animator = GetComponentInChildren<Animator>();
+        _moveSpeed += UpgradeManager.GetBonusMoveSpeed();
     }
 
     void Update()

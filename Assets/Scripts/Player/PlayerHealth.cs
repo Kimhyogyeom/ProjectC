@@ -38,6 +38,7 @@ public class PlayerHealth : MonoBehaviour
     #region Unity Lifecycle
     void Awake()
     {
+        _maxHp += UpgradeManager.GetBonusHp();
         _currentHp = _maxHp;
         _renderers = GetComponentsInChildren<Renderer>();
         _rendererDefaultState = new bool[_renderers.Length];
