@@ -3,23 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// 강화 UI 패널
-/// - 상단: 플레이어 현재 스탯 표시
-/// - 하단: 4개 강화 버튼 (스탯명 + 레벨 + 비용)
-///
-/// ===== Unity 셋업 가이드 =====
-/// 1. LobbyScene → Canvas 아래에 빈 GameObject "EnhancePanel" 생성, 이 스크립트 붙이기
-/// 2. EnhancePanel 안에 Panel(배경) 생성 → _panel에 연결
-/// 3. 상단 영역: TMP_Text 4개 생성 (공격력/HP/이동속도/공격속도) → _damageText, _hpText, _moveSpeedText, _attackSpeedText에 연결
-/// 4. (선택) 상단에 플레이어 3D 모델 표시하고 싶으면 RawImage + RenderTexture 또는 씬에 캐릭터 배치
-/// 5. 하단 영역: Button 4개 생성 (각 버튼 안에 TMP_Text 자식)
-///    - _damageBtnObj, _hpBtnObj, _moveSpeedBtnObj, _attackSpeedBtnObj → 버튼 연결
-///    - _damageBtnText, _hpBtnText, _moveSpeedBtnText, _attackSpeedBtnText → 버튼 안 텍스트 연결
-/// 6. 골드 표시: TMP_Text → _goldText에 연결
-/// 7. 닫기 버튼: Button → _closeButton에 연결
-/// 8. _panel은 기본 비활성화(SetActive false) 상태로 두기
-/// 9. LobbyManager Inspector에서 _enhanceUI에 이 오브젝트 드래그 연결
-/// =============================
+/// 강화 UI 패널 — 로비에서 골드를 소비해 영구 스탯 강화
 /// </summary>
 public class EnhanceUI : MonoBehaviour
 {
@@ -47,6 +31,10 @@ public class EnhanceUI : MonoBehaviour
 
     [Header("Gold")]
     [SerializeField] TMP_Text _goldText;
+
+    [Header("Level Up Effect")]
+    [SerializeField] Image _flashImage;
+    [SerializeField] float _flashDuration = 0.3f;
 
     [Header("Close")]
     [SerializeField] Button _closeButton;
@@ -83,7 +71,31 @@ public class EnhanceUI : MonoBehaviour
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxButton();
 
         if (UpgradeManager.TryUpgrade(type))
+        {
             RefreshUI();
+            if (_flashImage != null) StartCoroutine(FlashRoutine());
+        }
+    }
+    #endregion
+
+    #region Flash Effect
+    System.Collections.IEnumerator FlashRoutine()
+    {
+        _flashImage.gameObject.SetActive(true);
+        Color c = _flashImage.color;
+        c.a = 1f;
+        _flashImage.color = c;
+
+        float elapsed = 0f;
+        while (elapsed < _flashDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            c.a = Mathf.Lerp(1f, 0f, elapsed / _flashDuration);
+            _flashImage.color = c;
+            yield return null;
+        }
+
+        _flashImage.gameObject.SetActive(false);
     }
     #endregion
 

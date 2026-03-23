@@ -33,13 +33,9 @@ public class LobbyManager : MonoBehaviour
     [SerializeField] GameObject _bonusCardIndicator;  // Start 버튼 위 Card+1 표시
 
     [Header("UI - 하단 버튼")]
-    [SerializeField] Button _enhanceButton;
     [SerializeField] Button _gemShopButton;
     [SerializeField] Button _rewardButton;
-    [SerializeField] Button _settingsButton;
-
-    [Header("UI - 강화")]
-    [SerializeField] EnhanceUI _enhanceUI;
+    [SerializeField] Button _soundButton;
     #endregion
 
     #region Private Fields
@@ -55,10 +51,9 @@ public class LobbyManager : MonoBehaviour
         _rightButton.onClick.AddListener(OnRightClicked);
         _startButton.onClick.AddListener(OnStartClicked);
 
-        if (_enhanceButton != null) _enhanceButton.onClick.AddListener(OnEnhanceClicked);
         if (_gemShopButton != null) _gemShopButton.onClick.AddListener(OnGemShopClicked);
         if (_rewardButton != null) _rewardButton.onClick.AddListener(OnRewardClicked);
-        if (_settingsButton != null) _settingsButton.onClick.AddListener(OnSettingsClicked);
+        if (_soundButton != null) _soundButton.onClick.AddListener(OnSoundClicked);
     }
 
     void Start()
@@ -72,6 +67,11 @@ public class LobbyManager : MonoBehaviour
     #endregion
 
     #region UI
+    void Update()
+    {
+        UpdateGoldUI();
+    }
+
     void UpdateGoldUI()
     {
         if (_goldText == null) return;
@@ -175,22 +175,15 @@ public class LobbyManager : MonoBehaviour
         SceneTransition.Instance.LoadScene(_stages[_currentIndex].sceneName);
     }
 
-    void OnEnhanceClicked()
-    {
-        if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxButton();
-        if (_enhanceUI != null) _enhanceUI.Open();
-    }
-
     void OnGemShopClicked()
     {
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxButton();
         // TODO: 보석 상점 UI 열기
     }
 
-    void OnSettingsClicked()
+    void OnSoundClicked()
     {
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxButton();
-        // TODO: 설정 UI 열기
     }
 
     void OnRewardClicked()

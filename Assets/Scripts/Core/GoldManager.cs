@@ -22,6 +22,7 @@ public class GoldManager : MonoBehaviour
     const string GOLD_PREFS_KEY = "TotalGold";
     int _gold = 0;          // 인게임 세션 골드 (매판 초기화)
     static int _totalGold = 0;  // 누적 골드
+    static bool _loaded = false;
     #endregion
 
     #region Unity Lifecycle
@@ -31,17 +32,43 @@ public class GoldManager : MonoBehaviour
         Instance = this;
         LoadGold();
     }
+
+    void OnApplicationQuit()
+    {
+        if (_gold > 0) SaveSessionGold();
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this && _gold > 0) SaveSessionGold();
+    }
     #endregion
 
     #region Public API
     public int Gold => _gold;
-    public static int TotalGold => _totalGold;
+    public static int TotalGold
+    {
+        get
+        {
+            if (!_loaded) LoadGold();
+            return _totalGold;
+        }
+    }
     public event Action<int> OnGoldChanged;
 
     /// <summary>로비로 나갈 때 호출 — 인게임 골드를 누적 골드에 더함</summary>
     public void SaveSessionGold()
     {
+        if (_gold <= 0) return;
         _totalGold += _gold;
+        _gold = 0;
+        SaveGold();
+    }
+
+    /// <summary>누적 골드 직접 설정 (디버그용)</summary>
+    public static void SetTotalGold(int amount)
+    {
+        _totalGold = amount;
         SaveGold();
     }
 
@@ -58,6 +85,7 @@ public class GoldManager : MonoBehaviour
     static void LoadGold()
     {
         _totalGold = PlayerPrefs.GetInt(GOLD_PREFS_KEY, 0);
+        _loaded = true;
     }
 
     static void SaveGold()
