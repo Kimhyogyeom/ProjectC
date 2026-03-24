@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 /// <summary>
 /// 게임 오버 UI
@@ -18,6 +19,11 @@ public class GameOverUI : MonoBehaviour
     [SerializeField] GameObject _gameOverPanel;
     [SerializeField] Button _retryButton;
     [SerializeField] Button _lobbyButton;
+
+    [Header("Result Stats")]
+    [SerializeField] TMP_Text _waveText;
+    [SerializeField] TMP_Text _killText;
+    [SerializeField] TMP_Text _goldText;
     #endregion
 
     #region Unity Lifecycle
@@ -50,8 +56,18 @@ public class GameOverUI : MonoBehaviour
         }
 
         _gameOverPanel.SetActive(true);
+        UpdateResultStats();
         Time.timeScale = 0f;
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxGameOver();
+    }
+    #endregion
+
+    #region Result Stats
+    void UpdateResultStats()
+    {
+        if (_waveText != null) _waveText.text = GameStats.MaxWave.ToString();
+        if (_killText != null) _killText.text = GameStats.KillCount.ToString();
+        if (_goldText != null) _goldText.text = GameStats.GoldEarned.ToString("N0");
     }
     #endregion
 

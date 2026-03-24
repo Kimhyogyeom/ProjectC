@@ -47,6 +47,7 @@ public class WaveManager : MonoBehaviour
     #region Unity Lifecycle
     void Start()
     {
+        GameStats.Reset();
         if (AudioManager.Instance != null) AudioManager.Instance.PlayBgmGame();
         if (_debugStartWave > 1)
             _currentWave = _debugStartWave - 1;
@@ -76,6 +77,7 @@ public class WaveManager : MonoBehaviour
     void StartNextWave()
     {
         _currentWave++;
+        GameStats.SetWave(_currentWave);
         bool isBossWave = _currentWave % _bossWaveInterval == 0 || (_debugBossFirstWave && _currentWave == 1);
 
         if (isBossWave)

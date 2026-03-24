@@ -104,6 +104,7 @@ public class GoldManager : MonoBehaviour
         else
         {
             _gold += amount;
+            GameStats.AddGold(amount);
             OnGoldChanged?.Invoke(_gold);
         }
     }
@@ -138,6 +139,7 @@ public class GoldManager : MonoBehaviour
     void OnCoinArrived(int amount)
     {
         _gold += amount;
+        GameStats.AddGold(amount);
         OnGoldChanged?.Invoke(_gold);
     }
     #endregion
