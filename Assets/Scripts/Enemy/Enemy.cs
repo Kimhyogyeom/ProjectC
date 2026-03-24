@@ -369,6 +369,9 @@ public class Enemy : MonoBehaviour
 
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxEnemyDie();
 
+        // 통계 기록
+        GameStats.AddKill(_isBoss);
+
         // 골드 지급 (적 위치에서 UI로 날아감)
         if (GoldManager.Instance != null)
             GoldManager.Instance.AddGold(_goldDrop, transform.position);
