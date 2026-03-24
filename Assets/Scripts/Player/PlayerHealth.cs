@@ -161,4 +161,21 @@ public class PlayerHealth : MonoBehaviour
         OnPlayerDied?.Invoke();
     }
     #endregion
+
+    #region Revive
+    /// <summary>부활 처리 (HP 50% 회복 + 무적 적용)</summary>
+    public void Revive()
+    {
+        _currentHp = Mathf.RoundToInt(_maxHp * 0.5f);
+        gameObject.SetActive(true);
+        UpdateHPBar();
+
+        // 부활 직후 무적 적용
+        _lastHitTime = Time.time;
+
+        // 깜빡임 피드백
+        if (_flashCoroutine != null) StopCoroutine(_flashCoroutine);
+        _flashCoroutine = StartCoroutine(FlashRoutine());
+    }
+    #endregion
 }
