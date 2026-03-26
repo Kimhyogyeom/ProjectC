@@ -1,10 +1,11 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 경험치 구슬
+/// 경험치 구슬 (오브젝트 풀링)
 /// - 몬스터 사망 시 스폰
 /// - PlayerLevel이 OverlapSphere로 감지 후 Attract() 호출
-/// - 플레이어에게 닿으면 경험치 지급 후 소멸
+/// - 플레이어에게 닿으면 경험치 지급 후 풀에 반납
 /// </summary>
 public class ExpOrb : MonoBehaviour
 {
@@ -16,29 +17,88 @@ public class ExpOrb : MonoBehaviour
     [SerializeField] float _collectDistance = 0.3f; // 경험치 지급 거리
     #endregion
 
+    #region Pool
+    static readonly Queue<ExpOrb> _pool = new Queue<ExpOrb>();
+    static Transform _poolParent;
+
+    static void EnsurePoolParent()
+    {
+        if (_poolParent == null)
+        {
+            _poolParent = new GameObject("[ExpOrbPool]").transform;
+            Object.DontDestroyOnLoad(_poolParent.gameObject);
+        }
+    }
+
+    public static ExpOrb Spawn(GameObject prefab, Vector3 position)
+    {
+        EnsurePoolParent();
+
+        ExpOrb orb;
+        if (_pool.Count > 0)
+        {
+            orb = _pool.Dequeue();
+            orb.transform.SetParent(null);
+            orb.transform.position = position;
+            orb.gameObject.SetActive(true);
+        }
+        else
+        {
+            GameObject obj = Instantiate(prefab, position, Quaternion.identity);
+            orb = obj.GetComponent<ExpOrb>();
+        }
+        orb.ResetState();
+        return orb;
+    }
+
+    void ReturnToPool()
+    {
+        gameObject.SetActive(false);
+        EnsurePoolParent();
+        transform.SetParent(_poolParent);
+        _pool.Enqueue(this);
+    }
+
+    void ResetState()
+    {
+        _isAttracted = false;
+        _collected = false;
+        _aliveTimer = 0f;
+    }
+    #endregion
+
     #region Private Fields
-    Transform _player;
-    PlayerLevel _playerLevel;
+    static Transform _player;
+    static PlayerLevel _playerLevel;
     bool _isAttracted = false;
     bool _collected = false;
+    float _aliveTimer = 0f;
     #endregion
 
     #region Unity Lifecycle
     void Start()
     {
-        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-        if (playerObj != null)
+        if (_player == null)
         {
-            _player = playerObj.transform;
-            _playerLevel = playerObj.GetComponent<PlayerLevel>();
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj != null)
+            {
+                _player = playerObj.transform;
+                _playerLevel = playerObj.GetComponent<PlayerLevel>();
+            }
         }
-
-        Destroy(gameObject, _lifetime);
     }
 
     void Update()
     {
         if (_player == null || _collected) return;
+
+        _aliveTimer += Time.deltaTime;
+        if (_aliveTimer >= _lifetime)
+        {
+            ReturnToPool();
+            return;
+        }
 
         if (_isAttracted)
         {
@@ -73,7 +133,7 @@ public class ExpOrb : MonoBehaviour
 
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxExpOrb();
 
-        Destroy(gameObject);
+        ReturnToPool();
     }
     #endregion
 }
