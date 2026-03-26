@@ -35,6 +35,12 @@ public class Enemy : MonoBehaviour
     [SerializeField] Image _hpBarFill;
     #endregion
 
+    #region Static Enemy List
+    static readonly List<Enemy> _aliveEnemies = new List<Enemy>();
+    /// <summary>현재 살아있는 적 목록 (읽기 전용)</summary>
+    public static IReadOnlyList<Enemy> AliveEnemies => _aliveEnemies;
+    #endregion
+
     #region Private Fields
     int _currentHp;
     Transform _player;
@@ -49,6 +55,7 @@ public class Enemy : MonoBehaviour
     System.Action<float> _onHpChanged;   // 보스 HP바 UI 연동용
     bool _hasMovingParam;
     bool _hasVelocityParam;
+    WaveManager _waveManager;
     #endregion
 
     #region Unity Lifecycle
@@ -102,6 +109,13 @@ public class Enemy : MonoBehaviour
     void Start()
     {
         _player = GameObject.FindGameObjectWithTag("Player").transform;
+        _waveManager = FindFirstObjectByType<WaveManager>();
+        _aliveEnemies.Add(this);
+    }
+
+    void OnDestroy()
+    {
+        _aliveEnemies.Remove(this);
     }
 
     void Update()
@@ -376,9 +390,8 @@ public class Enemy : MonoBehaviour
         if (GoldManager.Instance != null)
             GoldManager.Instance.AddGold(_goldDrop, transform.position);
 
-        WaveManager waveManager = FindFirstObjectByType<WaveManager>();
-        if (waveManager != null)
-            waveManager.OnEnemyDied();
+        if (_waveManager != null)
+            _waveManager.OnEnemyDied();
 
         StartCoroutine(DeathRoutine());
     }
