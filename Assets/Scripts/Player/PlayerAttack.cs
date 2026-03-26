@@ -112,16 +112,14 @@ public class PlayerAttack : MonoBehaviour
 
     Transform FindClosestEnemy()
     {
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-
         Transform closest = null;
         float closestDistance = _attackRange;
 
-        foreach (GameObject enemy in enemies)
+        var enemies = Enemy.AliveEnemies;
+        for (int i = 0; i < enemies.Count; i++)
         {
-            // 죽은 적 제외
-            Enemy enemyComp = enemy.GetComponent<Enemy>();
-            if (enemyComp != null && enemyComp.IsDead) continue;
+            Enemy enemy = enemies[i];
+            if (enemy == null || enemy.IsDead) continue;
 
             float distance = Vector3.Distance(transform.position, enemy.transform.position);
             if (distance < closestDistance)
