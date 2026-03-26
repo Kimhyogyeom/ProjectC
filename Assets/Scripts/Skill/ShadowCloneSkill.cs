@@ -27,6 +27,7 @@ public class ShadowCloneSkill : MonoBehaviour
 
     float _damageRatio = 0.5f;
     bool _isPierce = false;
+    Animator _playerAnimator;
     #endregion
 
     #region Structs
@@ -119,6 +120,11 @@ public class ShadowCloneSkill : MonoBehaviour
     #endregion
 
     #region Unity Lifecycle
+    void Awake()
+    {
+        _playerAnimator = GetComponentInChildren<Animator>();
+    }
+
     void Update()
     {
         if (_clones.Count == 0) return;
@@ -152,15 +158,11 @@ public class ShadowCloneSkill : MonoBehaviour
             _clones[i].transform.rotation = record.rotation;
 
             // 이동 애니메이션 동기화
-            if (_cloneAnimators[i] != null)
+            if (_cloneAnimators[i] != null && _playerAnimator != null)
             {
-                Animator playerAnim = GetComponentInChildren<Animator>();
-                if (playerAnim != null)
-                {
-                    _cloneAnimators[i].SetBool("Moving", playerAnim.GetBool("Moving"));
-                    _cloneAnimators[i].SetFloat("Velocity X", playerAnim.GetFloat("Velocity X"));
-                    _cloneAnimators[i].SetFloat("Velocity Z", playerAnim.GetFloat("Velocity Z"));
-                }
+                _cloneAnimators[i].SetBool("Moving", _playerAnimator.GetBool("Moving"));
+                _cloneAnimators[i].SetFloat("Velocity X", _playerAnimator.GetFloat("Velocity X"));
+                _cloneAnimators[i].SetFloat("Velocity Z", _playerAnimator.GetFloat("Velocity Z"));
             }
         }
     }
