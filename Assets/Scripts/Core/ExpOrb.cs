@@ -109,7 +109,7 @@ public class ExpOrb : MonoBehaviour
             );
 
             // 플레이어에 충분히 가까워지면 경험치 지급
-            if (Vector3.Distance(transform.position, _player.position) <= _collectDistance)
+            if ((transform.position - _player.position).sqrMagnitude <= _collectDistance * _collectDistance)
                 Collect();
         }
     }

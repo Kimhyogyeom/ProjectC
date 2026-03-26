@@ -113,7 +113,7 @@ public class PlayerAttack : MonoBehaviour
     Transform FindClosestEnemy()
     {
         Transform closest = null;
-        float closestDistance = _attackRange;
+        float closestSqr = _attackRange * _attackRange;
 
         var enemies = Enemy.AliveEnemies;
         for (int i = 0; i < enemies.Count; i++)
@@ -121,10 +121,10 @@ public class PlayerAttack : MonoBehaviour
             Enemy enemy = enemies[i];
             if (enemy == null || enemy.IsDead) continue;
 
-            float distance = Vector3.Distance(transform.position, enemy.transform.position);
-            if (distance < closestDistance)
+            float sqrDist = (transform.position - enemy.transform.position).sqrMagnitude;
+            if (sqrDist < closestSqr)
             {
-                closestDistance = distance;
+                closestSqr = sqrDist;
                 closest = enemy.transform;
             }
         }
