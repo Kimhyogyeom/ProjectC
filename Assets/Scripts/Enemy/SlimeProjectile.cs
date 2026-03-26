@@ -1,9 +1,10 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 슬라임이 발사하는 침 투사체
+/// 슬라임이 발사하는 침 투사체 (오브젝트 풀링)
 /// - 발사 시점 플레이어 방향으로 직선 이동 (호밍 아님 → 피할 수 있음)
-/// - 플레이어 또는 벽에 닿으면 소멸
+/// - 플레이어 또는 벽에 닿으면 풀에 반납
 /// </summary>
 public class SlimeProjectile : MonoBehaviour
 {
@@ -12,9 +13,52 @@ public class SlimeProjectile : MonoBehaviour
     [SerializeField] float _lifetime = 4f;
     #endregion
 
+    #region Pool
+    static readonly Queue<SlimeProjectile> _pool = new Queue<SlimeProjectile>();
+    static Transform _poolParent;
+
+    static void EnsurePoolParent()
+    {
+        if (_poolParent == null)
+        {
+            _poolParent = new GameObject("[SlimeProjectilePool]").transform;
+            Object.DontDestroyOnLoad(_poolParent.gameObject);
+        }
+    }
+
+    public static SlimeProjectile Spawn(GameObject prefab, Vector3 position)
+    {
+        EnsurePoolParent();
+
+        SlimeProjectile proj;
+        if (_pool.Count > 0)
+        {
+            proj = _pool.Dequeue();
+            proj.transform.SetParent(null);
+            proj.transform.position = position;
+            proj.gameObject.SetActive(true);
+        }
+        else
+        {
+            GameObject obj = Instantiate(prefab, position, Quaternion.identity);
+            proj = obj.GetComponent<SlimeProjectile>();
+        }
+        return proj;
+    }
+
+    void ReturnToPool()
+    {
+        gameObject.SetActive(false);
+        EnsurePoolParent();
+        transform.SetParent(_poolParent);
+        _pool.Enqueue(this);
+    }
+    #endregion
+
     #region Private Fields
     Vector3 _direction;
     int _damage;
+    float _aliveTimer;
     #endregion
 
     /// <summary>슬라임이 발사 시 호출 — 방향과 데미지 설정</summary>
@@ -22,13 +66,17 @@ public class SlimeProjectile : MonoBehaviour
     {
         _direction = direction.normalized;
         _damage = damage;
-        Destroy(gameObject, _lifetime);
+        _aliveTimer = 0f;
     }
 
     #region Unity Lifecycle
     void Update()
     {
         transform.position += _direction * _speed * Time.deltaTime;
+
+        _aliveTimer += Time.deltaTime;
+        if (_aliveTimer >= _lifetime)
+            ReturnToPool();
     }
 
     void OnTriggerEnter(Collider other)
@@ -37,12 +85,11 @@ public class SlimeProjectile : MonoBehaviour
         {
             PlayerHealth ph = other.GetComponent<PlayerHealth>();
             if (ph != null) ph.TakeDamage(_damage);
-            Destroy(gameObject);
+            ReturnToPool();
         }
         else if (!other.isTrigger)
         {
-            // 벽이나 지형에 맞으면 소멸
-            Destroy(gameObject);
+            ReturnToPool();
         }
     }
     #endregion
