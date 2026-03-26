@@ -179,8 +179,7 @@ public class PlayerAttack : MonoBehaviour
 
     void SpawnProjectile(Vector3 position, Vector3 direction, float damageRatio, bool isPierce)
     {
-        GameObject proj = Instantiate(_projectilePrefab, position, Quaternion.LookRotation(direction));
-        Projectile projectile = proj.GetComponent<Projectile>();
+        Projectile projectile = Projectile.Spawn(_projectilePrefab, position, Quaternion.LookRotation(direction));
         if (projectile == null) return;
 
         projectile.Init(direction, _projectileSpeed, damageRatio, isPierce);

@@ -23,8 +23,7 @@ public class CloneAttack : MonoBehaviour
     {
         if (projectilePrefab == null) return;
 
-        GameObject proj = Instantiate(projectilePrefab, transform.position, Quaternion.LookRotation(direction));
-        Projectile projectile = proj.GetComponent<Projectile>();
+        Projectile projectile = Projectile.Spawn(projectilePrefab, transform.position, Quaternion.LookRotation(direction));
         if (projectile != null)
         {
             float damageRatio = _shadowClone != null ? _shadowClone.DamageRatio : 0.5f;
