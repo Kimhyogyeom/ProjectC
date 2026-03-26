@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -42,6 +43,10 @@ public class BossBehavior : MonoBehaviour
     float _originalSpeed;
     Renderer[] _renderers;
     MaterialPropertyBlock _propBlock;
+    MaterialPropertyBlock _warningPropBlock;
+
+    // 경고 원 풀
+    readonly Queue<GameObject> _warningPool = new Queue<GameObject>();
     #endregion
 
     #region Unity Lifecycle
@@ -56,6 +61,7 @@ public class BossBehavior : MonoBehaviour
 
         _renderers = GetComponentsInChildren<Renderer>();
         _propBlock = new MaterialPropertyBlock();
+        _warningPropBlock = new MaterialPropertyBlock();
 
         _chargeTimer = 3f;
         _shockwaveTimer = 6f;
@@ -208,7 +214,7 @@ public class BossBehavior : MonoBehaviour
         _agent.isStopped = true;
 
         // --- 전조 1: 바닥에 빨간 경고 원 표시 ---
-        GameObject warningObj = CreateWarningCircle();
+        GameObject warningObj = GetWarningCircle();
         Vector3 warningPos = transform.position + Vector3.up * 0.05f;
         warningObj.transform.position = warningPos;
 
@@ -231,9 +237,8 @@ public class BossBehavior : MonoBehaviour
             float alpha = 0.15f + 0.15f * Mathf.Sin(warningElapsed * blinkSpeed);
             if (warningRenderer != null)
             {
-                MaterialPropertyBlock pb = new MaterialPropertyBlock();
-                pb.SetColor("_BaseColor", new Color(1f, 0.1f, 0.1f, alpha));
-                warningRenderer.SetPropertyBlock(pb);
+                _warningPropBlock.SetColor("_BaseColor", new Color(1f, 0.1f, 0.1f, alpha));
+                warningRenderer.SetPropertyBlock(_warningPropBlock);
             }
 
             yield return null;
@@ -251,9 +256,8 @@ public class BossBehavior : MonoBehaviour
         // --- 폭발 이펙트: 경고 원이 번쩍이고 사라짐 ---
         if (warningRenderer != null)
         {
-            MaterialPropertyBlock pb = new MaterialPropertyBlock();
-            pb.SetColor("_BaseColor", new Color(1f, 0.3f, 0.1f, 0.6f));
-            warningRenderer.SetPropertyBlock(pb);
+            _warningPropBlock.SetColor("_BaseColor", new Color(1f, 0.3f, 0.1f, 0.6f));
+            warningRenderer.SetPropertyBlock(_warningPropBlock);
         }
         warningObj.transform.localScale = new Vector3(_shockwaveRadius * 2f, 0.1f, _shockwaveRadius * 2f);
 
@@ -268,14 +272,13 @@ public class BossBehavior : MonoBehaviour
             float alpha = 0.6f * (1f - fadeElapsed / fadeDuration);
             if (warningRenderer != null)
             {
-                MaterialPropertyBlock pb = new MaterialPropertyBlock();
-                pb.SetColor("_BaseColor", new Color(1f, 0.3f, 0.1f, alpha));
-                warningRenderer.SetPropertyBlock(pb);
+                _warningPropBlock.SetColor("_BaseColor", new Color(1f, 0.3f, 0.1f, alpha));
+                warningRenderer.SetPropertyBlock(_warningPropBlock);
             }
             yield return null;
         }
 
-        Destroy(warningObj);
+        ReturnWarning(warningObj);
 
         if (_agent.isOnNavMesh)
             _agent.isStopped = false;
@@ -285,22 +288,35 @@ public class BossBehavior : MonoBehaviour
         _isActing = false;
     }
 
-    GameObject CreateWarningCircle()
+    GameObject GetWarningCircle()
     {
-        GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        obj.name = "BossWarning";
-        obj.transform.localScale = Vector3.zero;
+        if (_warningPool.Count > 0)
+        {
+            GameObject obj = _warningPool.Dequeue();
+            obj.transform.localScale = Vector3.zero;
+            obj.SetActive(true);
+            return obj;
+        }
 
-        // 콜라이더 제거
-        Collider col = obj.GetComponent<Collider>();
+        GameObject newObj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        newObj.name = "BossWarning";
+        newObj.transform.localScale = Vector3.zero;
+
+        Collider col = newObj.GetComponent<Collider>();
         if (col != null) Destroy(col);
 
-        // 머티리얼 적용
-        Renderer renderer = obj.GetComponent<Renderer>();
+        Renderer renderer = newObj.GetComponent<Renderer>();
         if (renderer != null && _warningMaterial != null)
             renderer.material = new Material(_warningMaterial);
 
-        return obj;
+        return newObj;
+    }
+
+    void ReturnWarning(GameObject obj)
+    {
+        if (obj == null) return;
+        obj.SetActive(false);
+        _warningPool.Enqueue(obj);
     }
     #endregion
 
@@ -326,7 +342,7 @@ public class BossBehavior : MonoBehaviour
             if (i == 0) randOffset = Vector2.zero;  // 첫 발은 플레이어 정확히
             positions[i] = playerPos + new Vector3(randOffset.x, 0.05f, randOffset.y);
 
-            warnings[i] = CreateWarningCircle();
+            warnings[i] = GetWarningCircle();
             warnings[i].transform.position = positions[i];
             warnings[i].transform.localScale = new Vector3(_meteorRadius * 2f, 0.01f, _meteorRadius * 2f);
         }
@@ -350,9 +366,8 @@ public class BossBehavior : MonoBehaviour
                 if (warnings[i] == null) continue;
                 Renderer r = warnings[i].GetComponent<Renderer>();
                 if (r == null) continue;
-                MaterialPropertyBlock pb = new MaterialPropertyBlock();
-                pb.SetColor("_BaseColor", new Color(1f, 0.1f, 0.1f, alpha));
-                r.SetPropertyBlock(pb);
+                _warningPropBlock.SetColor("_BaseColor", new Color(1f, 0.1f, 0.1f, alpha));
+                r.SetPropertyBlock(_warningPropBlock);
             }
 
             yield return null;
@@ -376,9 +391,8 @@ public class BossBehavior : MonoBehaviour
                 Renderer r = warnings[i].GetComponent<Renderer>();
                 if (r != null)
                 {
-                    MaterialPropertyBlock pb = new MaterialPropertyBlock();
-                    pb.SetColor("_BaseColor", new Color(1f, 0.4f, 0.1f, 0.7f));
-                    r.SetPropertyBlock(pb);
+                    _warningPropBlock.SetColor("_BaseColor", new Color(1f, 0.4f, 0.1f, 0.7f));
+                    r.SetPropertyBlock(_warningPropBlock);
                 }
                 warnings[i].transform.localScale = new Vector3(_meteorRadius * 2.5f, 0.15f, _meteorRadius * 2.5f);
             }
@@ -389,7 +403,7 @@ public class BossBehavior : MonoBehaviour
         // 전체 페이드 아웃
         yield return new WaitForSeconds(0.1f);
         for (int i = 0; i < _meteorCount; i++)
-            if (warnings[i] != null) Destroy(warnings[i]);
+            ReturnWarning(warnings[i]);
 
         if (_agent.isOnNavMesh)
             _agent.isStopped = false;
