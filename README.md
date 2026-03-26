@@ -133,6 +133,15 @@ Archero 스타일의 하이브리드 캐주얼 액션 RPG 프로토타입.
 - 던전 맵 제작 (용암 던전 테마, NavMesh 베이크 완료)
 - 스킬 디버그 키 (에디터 전용, 숫자 1~7키로 스킬 즉시 레벨업)
 
+#### 성능 최적화
+- **적 리스트 캐싱** — `FindGameObjectsWithTag("Enemy")` 제거, `static List<Enemy>` 중앙 관리로 변경하여 매 공격마다 발생하던 씬 전체 탐색 및 GC 할당 제거
+- **경험치 구슬 감지 주기 제한** — `Physics.OverlapSphere` 호출을 매 프레임에서 0.15초 간격으로 변경, 초당 물리 연산 약 90% 절감
+- **컴포넌트 참조 캐싱** — 분신술 스킬에서 매 프레임 `GetComponentInChildren<Animator>()` 호출을 `Awake()` 1회 캐싱으로 변경
+- **오브젝트 풀링 적용** — 표창 투사체, 슬라임 투사체, 경험치 구슬, 힐 아이템, 보스 경고 이펙트에 오브젝트 풀링 도입. `Instantiate`/`Destroy` 반복을 제거하여 GC 스파이크 방지
+- **MaterialPropertyBlock 캐싱** — 보스 경고 이펙트에서 루프마다 `new MaterialPropertyBlock()` 생성을 1개 인스턴스 재사용으로 변경
+- **거리 비교 최적화** — `Vector3.Distance`를 `sqrMagnitude`로 변경하여 제곱근(sqrt) 연산 제거
+- **미사용 스크립트 제거** — 빈 `Update()`를 가진 Init.cs 삭제로 불필요한 매 프레임 호출 제거
+
 ### 🔧 이후 작업
 
 #### UI / 시스템 (Unity 셋업 필요)
