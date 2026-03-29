@@ -22,7 +22,6 @@ public class GoldUI : MonoBehaviour
     #region Unity Lifecycle
     void Start()
     {
-        // GoldManager보다 늦게 실행될 수 있어서 1프레임 뒤에 구독
         StartCoroutine(Subscribe());
     }
 

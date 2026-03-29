@@ -69,7 +69,6 @@ public class SkillManager : MonoBehaviour
         int level = _acquiredSkills[skillType];
         ApplySkillEffect(skillType, level);
 
-        Debug.Log($"스킬 획득: {skillType} Lv.{level}");
     }
 
     /// <summary>현재 스킬 레벨 반환 (없으면 0)</summary>

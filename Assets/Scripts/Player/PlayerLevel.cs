@@ -94,8 +94,6 @@ public class PlayerLevel : MonoBehaviour
         _currentLevel++;
         _expRequired = Mathf.RoundToInt(_baseExpRequired * Mathf.Pow(_expGrowthRate, _currentLevel - 1));
 
-        Debug.Log($"레벨업! 현재 레벨: {_currentLevel} / 다음 레벨까지: {_expRequired}");
-
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxLevelUp();
 
         // 레벨업 이펙트

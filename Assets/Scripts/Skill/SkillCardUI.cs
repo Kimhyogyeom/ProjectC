@@ -161,7 +161,6 @@ public class SkillCardUI : MonoBehaviour
         _canvasGroup.alpha = 1f;
     }
 
-    // EaseOutBack: 살짝 넘어갔다 돌아오는 느낌
     float EaseOutBack(float t)
     {
         const float c1 = 1.70158f;
@@ -169,7 +168,6 @@ public class SkillCardUI : MonoBehaviour
         return 1f + c3 * Mathf.Pow(t - 1f, 3f) + c1 * Mathf.Pow(t - 1f, 2f);
     }
 
-    // EaseOutCubic: 부드러운 감속
     float EaseOutCubic(float t)
     {
         return 1f - Mathf.Pow(1f - t, 3f);

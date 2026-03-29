@@ -23,7 +23,10 @@
       "Bash(JAVA_HOME=\"D:/Unity/6000.0.61f1/Editor/Data/PlaybackEngines/AndroidPlayer/OpenJDK\" PATH=\"D:/Unity/6000.0.61f1/Editor/Data/PlaybackEngines/AndroidPlayer/OpenJDK/bin:$PATH\" \"D:/Unity/6000.0.61f1/Editor/Data/PlaybackEngines/AndroidPlayer/SDK/platform-tools/adb.exe\" logcat -s Unity -d)",
       "Bash(find c:/UnityProject/ProjectC/Assets -name LobbyScene* -o -name GameScene* -o -name Lobby*prefab)",
       "Bash(grep -E \"\\\\.cs$\")",
-      "Bash(wc -l /c/UnityProject/ProjectC/Assets/Scripts/**/*.cs)"
+      "Bash(wc -l /c/UnityProject/ProjectC/Assets/Scripts/**/*.cs)",
+      "Bash(find /c/Unity_Project/ProjectC/Assets/Scripts -type f -name *.cs)",
+      "Bash(grep -A1 \"{$\")",
+      "Bash(grep -n \"GetComponent\\\\|FindObjectOfType\\\\|Find.*GameObject\" /c/Unity_Project/ProjectC/Assets/Scripts/Player/*.cs)"
     ]
   }
 }
