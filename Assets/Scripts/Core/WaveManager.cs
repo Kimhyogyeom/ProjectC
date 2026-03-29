@@ -82,7 +82,6 @@ public class WaveManager : MonoBehaviour
 
         if (isBossWave)
         {
-            Debug.Log($"[Wave] 웨이브 {_currentWave} - 보스 등장!");
             OnWaveStarted?.Invoke(_currentWave);
 
             _aliveEnemyCount = 1;
@@ -94,7 +93,6 @@ public class WaveManager : MonoBehaviour
         {
             int spawnCount = _startEnemyCount + (_currentWave - 1) * _enemyIncreasePerWave;
 
-            Debug.Log($"[Wave] 웨이브 {_currentWave} 시작 - 적 {spawnCount}마리");
             OnWaveStarted?.Invoke(_currentWave);
 
             _aliveEnemyCount = spawnCount;
@@ -206,7 +204,6 @@ public class WaveManager : MonoBehaviour
     #region Routines
     IEnumerator NextWaveRoutine()
     {
-        Debug.Log($"[Wave] 웨이브 {_currentWave} 클리어! {_waveCooldown}초 후 다음 웨이브");
         yield return new WaitForSeconds(_waveCooldown);
         StartNextWave();
     }

@@ -79,7 +79,6 @@ public class BossBehavior : MonoBehaviour
         if (_enemy.IsDead || _player == null || _isActing) return;
         if (_agent == null || !_agent.isOnNavMesh)
         {
-            Debug.LogWarning($"[Boss] NavMesh 없음 - agent={_agent != null}, onNavMesh={_agent?.isOnNavMesh}");
             return;
         }
 
@@ -92,7 +91,6 @@ public class BossBehavior : MonoBehaviour
         // 돌진 (거리 10 이내)
         if (_chargeTimer <= 0f && dist < 10f)
         {
-            Debug.Log("[Boss] 돌진 시작");
             StartCoroutine(ChargeRoutine());
             _chargeTimer = _chargeCooldown;
             return;
@@ -101,7 +99,6 @@ public class BossBehavior : MonoBehaviour
         // 충격파 (거리 7 이내)
         if (_shockwaveTimer <= 0f && dist < 7f)
         {
-            Debug.Log("[Boss] 충격파 시작");
             StartCoroutine(ShockwaveRoutine());
             _shockwaveTimer = _shockwaveCooldown;
             return;
@@ -110,7 +107,6 @@ public class BossBehavior : MonoBehaviour
         // 바닥 폭격 (거리 무관, 원거리에서도 사용)
         if (_meteorTimer <= 0f)
         {
-            Debug.Log("[Boss] 바닥폭격 시작");
             StartCoroutine(MeteorRoutine());
             _meteorTimer = _meteorCooldown;
         }

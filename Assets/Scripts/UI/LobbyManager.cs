@@ -178,7 +178,6 @@ public class LobbyManager : MonoBehaviour
     void OnGemShopClicked()
     {
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxButton();
-        // TODO: 보석 상점 UI 열기
     }
 
     void OnSoundClicked()
