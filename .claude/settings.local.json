@@ -26,7 +26,10 @@
       "Bash(wc -l /c/UnityProject/ProjectC/Assets/Scripts/**/*.cs)",
       "Bash(find /c/Unity_Project/ProjectC/Assets/Scripts -type f -name *.cs)",
       "Bash(grep -A1 \"{$\")",
-      "Bash(grep -n \"GetComponent\\\\|FindObjectOfType\\\\|Find.*GameObject\" /c/Unity_Project/ProjectC/Assets/Scripts/Player/*.cs)"
+      "Bash(grep -n \"GetComponent\\\\|FindObjectOfType\\\\|Find.*GameObject\" /c/Unity_Project/ProjectC/Assets/Scripts/Player/*.cs)",
+      "Bash(wc -l c:/UnityProject/ProjectC/Assets/Scripts/**/*.cs)",
+      "Bash(grep -l \"public class.*Enemy\" c:/UnityProject/ProjectC/Assets/Scripts/Enemy/*.cs)",
+      "Bash(grep -l \"BatEnemy\\\\|SlimeRangedAttack\" c:/UnityProject/ProjectC/Assets/Scripts/Enemy/*.cs)"
     ]
   }
 }

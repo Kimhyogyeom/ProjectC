@@ -174,6 +174,8 @@ public class BossBehavior : MonoBehaviour
                 {
                     PlayerHealth ph = _player.GetComponent<PlayerHealth>();
                     if (ph != null) ph.TakeDamage(_chargeDamage);
+                    if (TopDownCamera.Instance != null)
+                        TopDownCamera.Instance.Shake(0.3f, 0.3f);
                     hasHit = true;
                 }
             }
@@ -241,6 +243,9 @@ public class BossBehavior : MonoBehaviour
         }
 
         // --- 폭발: 범위 데미지 ---
+        if (TopDownCamera.Instance != null)
+            TopDownCamera.Instance.Shake(0.25f, 0.3f);
+
         Collider[] hits = Physics.OverlapSphere(transform.position, _shockwaveRadius);
         foreach (Collider col in hits)
         {
@@ -372,6 +377,10 @@ public class BossBehavior : MonoBehaviour
         // 순차적으로 폭발 (0.15초 간격)
         for (int i = 0; i < _meteorCount; i++)
         {
+            // 폭격 셰이크
+            if (TopDownCamera.Instance != null)
+                TopDownCamera.Instance.Shake(0.2f, 0.15f);
+
             // 해당 위치 범위 데미지
             Collider[] hits = Physics.OverlapSphere(positions[i], _meteorRadius);
             foreach (Collider col in hits)

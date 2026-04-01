@@ -22,11 +22,20 @@ public class TopDownCamera : MonoBehaviour
     #region Private Fields
     Camera _cam;
     Quaternion _fixedRotation;
+    Vector3 _shakeOffset;
+    float _shakeDuration;
+    float _shakeTimer;
+    float _shakeMagnitude;
+    #endregion
+
+    #region Static Instance
+    public static TopDownCamera Instance { get; private set; }
     #endregion
 
     #region Unity Lifecycle
     void Awake()
     {
+        Instance = this;
         _cam = GetComponent<Camera>();
     }
 
@@ -46,6 +55,7 @@ public class TopDownCamera : MonoBehaviour
         if (_target == null) return;
 
         FollowTarget();
+        ApplyShake();
     }
     #endregion
 
@@ -80,6 +90,39 @@ public class TopDownCamera : MonoBehaviour
 
         transform.position = smoothed;
         transform.rotation = _fixedRotation;
+    }
+    #endregion
+
+    #region Shake
+    void ApplyShake()
+    {
+        if (_shakeTimer <= 0f) return;
+
+        _shakeTimer -= Time.deltaTime;
+        float t = _shakeTimer / _shakeDuration;  // 1→0 감쇠
+        float magnitude = _shakeMagnitude * t;
+
+        _shakeOffset = new Vector3(
+            Random.Range(-magnitude, magnitude),
+            Random.Range(-magnitude, magnitude) * 0.5f,
+            Random.Range(-magnitude, magnitude)
+        );
+
+        transform.position += _shakeOffset;
+
+        if (_shakeTimer <= 0f)
+            _shakeOffset = Vector3.zero;
+    }
+
+    /// <summary>카메라 셰이크 (magnitude: 흔들림 세기, duration: 지속 시간)</summary>
+    public void Shake(float magnitude = 0.15f, float duration = 0.2f)
+    {
+        // 더 강한 셰이크가 진행 중이면 무시
+        if (_shakeTimer > 0f && _shakeMagnitude > magnitude) return;
+
+        _shakeMagnitude = magnitude;
+        _shakeDuration = duration;
+        _shakeTimer = duration;
     }
     #endregion
 }
