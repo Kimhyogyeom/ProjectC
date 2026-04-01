@@ -393,7 +393,40 @@ public class Enemy : MonoBehaviour
         if (_waveManager != null)
             _waveManager.OnEnemyDied();
 
+        // 보스 처치 슬로우 모션
+        if (_isBoss)
+            StartCoroutine(BossKillSlowMotion());
+
         StartCoroutine(DeathRoutine());
+    }
+
+    IEnumerator BossKillSlowMotion()
+    {
+        // 카메라 셰이크
+        if (TopDownCamera.Instance != null)
+            TopDownCamera.Instance.Shake(0.35f, 0.4f);
+
+        // 슬로우 모션 시작
+        Time.timeScale = 0.1f;
+        Time.fixedDeltaTime = 0.02f * Time.timeScale;
+
+        // 실제 시간 1초 대기 (게임 시간이 아닌 실제 시간)
+        yield return new WaitForSecondsRealtime(1f);
+
+        // 서서히 복귀 (실제 시간 0.5초)
+        float elapsed = 0f;
+        float duration = 0.5f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = elapsed / duration;
+            Time.timeScale = Mathf.Lerp(0.1f, 1f, t);
+            Time.fixedDeltaTime = 0.02f * Time.timeScale;
+            yield return null;
+        }
+
+        Time.timeScale = 1f;
+        Time.fixedDeltaTime = 0.02f;
     }
 
     IEnumerator DeathRoutine()
