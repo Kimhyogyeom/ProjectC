@@ -170,6 +170,14 @@ public class FirebaseManager : MonoBehaviour
         });
     }
 
+    /// <summary>임시 로그인 처리 (Google Play 승인 전 테스트용, 승인 후 제거)</summary>
+    public void SetTempLogin(string name)
+    {
+        IsGoogleLinked = true;
+        DisplayName = name;
+        OnGoogleLoginResult?.Invoke(true);
+    }
+
     /// <summary>로그아웃</summary>
     public void SignOut()
     {

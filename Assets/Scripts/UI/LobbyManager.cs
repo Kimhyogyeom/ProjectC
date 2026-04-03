@@ -217,22 +217,26 @@ public class LobbyManager : MonoBehaviour
     {
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxButton();
 
-#if UNITY_ANDROID
+        // TODO: Google Play 승인 후 임시 로그인 제거하고 원래 코드 복원
         if (FirebaseManager.Instance != null && FirebaseManager.Instance.IsGoogleLinked)
         {
+#if UNITY_ANDROID
             if (GoogleSignInHelper.Instance != null)
                 GoogleSignInHelper.Instance.SignOut();
+#endif
+            FirebaseManager.Instance.SignOut();
             UpdateLoginUI();
             UpdateGoldUI();
         }
         else
         {
-            if (GoogleSignInHelper.Instance != null)
-                GoogleSignInHelper.Instance.SignIn();
+            Debug.Log("[Login] 임시 로그인 처리");
+            if (FirebaseManager.Instance != null)
+            {
+                FirebaseManager.Instance.SetTempLogin("테스트유저");
+                OnGoogleLoginResult(true);
+            }
         }
-#else
-        Debug.Log("[Login] Google 로그인은 Android 빌드에서만 동작합니다.");
-#endif
     }
 
     void OnGoogleLoginResult(bool success)
