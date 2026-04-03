@@ -21,6 +21,9 @@ public static class UpgradeManager
 
     public static int GetLevel(StatType type)
     {
+        if (FirebaseManager.Instance != null && FirebaseManager.Instance.IsDataLoaded)
+            return FirebaseManager.Instance.GetUpgradeLevel(type);
+
         return PlayerPrefs.GetInt(GetPrefsKey(type), 0);
     }
 
@@ -38,6 +41,9 @@ public static class UpgradeManager
         int newLevel = GetLevel(type) + 1;
         PlayerPrefs.SetInt(GetPrefsKey(type), newLevel);
         PlayerPrefs.Save();
+
+        if (FirebaseManager.Instance != null)
+            FirebaseManager.Instance.SaveUpgradeLevel(type, newLevel);
         return true;
     }
 

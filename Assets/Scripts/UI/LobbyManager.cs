@@ -63,6 +63,10 @@ public class LobbyManager : MonoBehaviour
         UpdateUI();
         UpdateGoldUI();
         UpdateBonusCardUI();
+
+        // Firebase 데이터 로드 완료 시 골드 UI 갱신
+        if (FirebaseManager.Instance != null && !FirebaseManager.Instance.IsDataLoaded)
+            FirebaseManager.Instance.OnDataLoaded += UpdateGoldUI;
     }
     #endregion
 
