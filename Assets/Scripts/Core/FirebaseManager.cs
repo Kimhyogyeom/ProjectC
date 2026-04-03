@@ -17,7 +17,15 @@ public class FirebaseManager : MonoBehaviour
 
     public bool IsInitialized { get; private set; }
     public bool IsDataLoaded { get; private set; }
+    public bool IsGoogleLinked { get; private set; }
+    public string DisplayName { get; private set; }
     public event Action OnDataLoaded;
+    public event Action<bool> OnGoogleLoginResult;
+
+    public void NotifyGoogleLoginResult(bool success)
+    {
+        OnGoogleLoginResult?.Invoke(success);
+    }
 
     FirebaseAuth _auth;
     FirebaseFirestore _db;
@@ -67,6 +75,7 @@ public class FirebaseManager : MonoBehaviour
         if (_auth.CurrentUser != null)
         {
             _userId = _auth.CurrentUser.UserId;
+            CheckGoogleLinked();
             LoadUserData();
             return;
         }
@@ -80,10 +89,97 @@ public class FirebaseManager : MonoBehaviour
                 return;
             }
 
-            _userId = task.Result.User.UserId;
+            _userId = _auth.CurrentUser.UserId;
             Debug.Log($"[Firebase] 익명 인증 성공: {_userId}");
             LoadUserData();
         });
+    }
+
+    void CheckGoogleLinked()
+    {
+        if (_auth.CurrentUser == null) return;
+
+        foreach (var profile in _auth.CurrentUser.ProviderData)
+        {
+            if (profile.ProviderId == GoogleAuthProvider.ProviderId)
+            {
+                IsGoogleLinked = true;
+                DisplayName = profile.DisplayName;
+                return;
+            }
+        }
+        IsGoogleLinked = false;
+    }
+
+    /// <summary>Google 로그인 (익명 계정에 Google 연결)</summary>
+    public void LinkWithGoogle(string authCode)
+    {
+        Credential credential = GoogleAuthProvider.GetCredential(null, authCode);
+
+        if (_auth.CurrentUser.IsAnonymous)
+        {
+            // 익명 → Google 연결 (기존 데이터 유지)
+            _auth.CurrentUser.LinkWithCredentialAsync(credential).ContinueWithOnMainThread(task =>
+            {
+                if (task.IsFaulted)
+                {
+                    // 이미 다른 계정에 연결된 Google 계정이면 해당 계정으로 로그인
+                    Debug.LogWarning($"[Firebase] 계정 연결 실패, 기존 계정으로 로그인 시도: {task.Exception}");
+                    SignInWithGoogle(credential);
+                    return;
+                }
+
+                _userId = _auth.CurrentUser.UserId;
+                IsGoogleLinked = true;
+                DisplayName = _auth.CurrentUser.DisplayName;
+                Debug.Log($"[Firebase] Google 계정 연결 성공: {DisplayName}");
+
+                // Firestore에 displayName 저장
+                _db.Collection("users").Document(_userId)
+                    .UpdateAsync("displayName", DisplayName);
+
+                OnGoogleLoginResult?.Invoke(true);
+            });
+        }
+        else
+        {
+            SignInWithGoogle(credential);
+        }
+    }
+
+    void SignInWithGoogle(Credential credential)
+    {
+        _auth.SignInWithCredentialAsync(credential).ContinueWithOnMainThread(task =>
+        {
+            if (task.IsFaulted)
+            {
+                Debug.LogError($"[Firebase] Google 로그인 실패: {task.Exception}");
+                OnGoogleLoginResult?.Invoke(false);
+                return;
+            }
+
+            _userId = _auth.CurrentUser.UserId;
+            IsGoogleLinked = true;
+            DisplayName = _auth.CurrentUser.DisplayName;
+            Debug.Log($"[Firebase] Google 로그인 성공: {DisplayName}");
+
+            // 데이터 다시 로드 (Google 계정의 데이터)
+            IsDataLoaded = false;
+            LoadUserData();
+            OnGoogleLoginResult?.Invoke(true);
+        });
+    }
+
+    /// <summary>로그아웃</summary>
+    public void SignOut()
+    {
+        _auth.SignOut();
+        IsGoogleLinked = false;
+        DisplayName = null;
+        IsDataLoaded = false;
+
+        // 다시 익명 로그인
+        SignInAnonymously();
     }
     #endregion
 

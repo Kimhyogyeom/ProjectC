@@ -36,6 +36,10 @@ public class LobbyManager : MonoBehaviour
     [SerializeField] Button _gemShopButton;
     [SerializeField] Button _rewardButton;
     [SerializeField] Button _soundButton;
+
+    [Header("UI - 로그인")]
+    [SerializeField] Button _loginButton;
+    [SerializeField] TMP_Text _loginButtonText;
     #endregion
 
     #region Private Fields
@@ -54,6 +58,7 @@ public class LobbyManager : MonoBehaviour
         if (_gemShopButton != null) _gemShopButton.onClick.AddListener(OnGemShopClicked);
         if (_rewardButton != null) _rewardButton.onClick.AddListener(OnRewardClicked);
         if (_soundButton != null) _soundButton.onClick.AddListener(OnSoundClicked);
+        if (_loginButton != null) _loginButton.onClick.AddListener(OnLoginClicked);
     }
 
     void Start()
@@ -67,6 +72,11 @@ public class LobbyManager : MonoBehaviour
         // Firebase 데이터 로드 완료 시 골드 UI 갱신
         if (FirebaseManager.Instance != null && !FirebaseManager.Instance.IsDataLoaded)
             FirebaseManager.Instance.OnDataLoaded += UpdateGoldUI;
+
+        if (FirebaseManager.Instance != null)
+            FirebaseManager.Instance.OnGoogleLoginResult += OnGoogleLoginResult;
+
+        UpdateLoginUI();
     }
     #endregion
 
@@ -200,6 +210,48 @@ public class LobbyManager : MonoBehaviour
     {
         GameSessionData.HasBonusSkillCard = true;
         UpdateBonusCardUI();
+    }
+
+    void OnLoginClicked()
+    {
+        if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxButton();
+
+#if UNITY_ANDROID
+        if (FirebaseManager.Instance != null && FirebaseManager.Instance.IsGoogleLinked)
+        {
+            if (GoogleSignInHelper.Instance != null)
+                GoogleSignInHelper.Instance.SignOut();
+            UpdateLoginUI();
+            UpdateGoldUI();
+        }
+        else
+        {
+            if (GoogleSignInHelper.Instance != null)
+                GoogleSignInHelper.Instance.SignIn();
+        }
+#else
+        Debug.Log("[Login] Google 로그인은 Android 빌드에서만 동작합니다.");
+#endif
+    }
+
+    void OnGoogleLoginResult(bool success)
+    {
+        UpdateLoginUI();
+        if (success) UpdateGoldUI();
+    }
+
+    void UpdateLoginUI()
+    {
+        if (_loginButton == null || _loginButtonText == null) return;
+
+        if (FirebaseManager.Instance != null && FirebaseManager.Instance.IsGoogleLinked)
+        {
+            _loginButtonText.text = FirebaseManager.Instance.DisplayName ?? "로그인됨";
+        }
+        else
+        {
+            _loginButtonText.text = "Google 로그인";
+        }
     }
 
     #endregion
