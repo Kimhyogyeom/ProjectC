@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "464261711777",
-    "project_id": "projectc-f33bc",
-    "storage_bucket": "projectc-f33bc.firebasestorage.app"
+    "project_number": "258631615929",
+    "project_id": "projectc-41776",
+    "storage_bucket": "projectc-41776.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:464261711777:android:7c907daa15ead8f024ade0",
+        "mobilesdk_app_id": "1:258631615929:android:3ced9dc532ecbdeb896268",
         "android_client_info": {
-          "package_name": "com.DefaultCompany.ProjectC"
+          "package_name": "com.kimhyogyeom.projectc"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCDpPKlzvBaakOtVhPavDwjJcWqg6AlLwY"
+          "current_key": "AIzaSyAFzBHKmQBRNVabV9zU7ykewVbOlFHZqGg"
         }
       ],
       "services": {

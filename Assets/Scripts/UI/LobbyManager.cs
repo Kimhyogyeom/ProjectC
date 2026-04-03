@@ -40,6 +40,7 @@ public class LobbyManager : MonoBehaviour
     [Header("UI - 로그인")]
     [SerializeField] Button _loginButton;
     [SerializeField] TMP_Text _loginButtonText;
+    [SerializeField] GameObject _loginImage;
     #endregion
 
     #region Private Fields
@@ -244,7 +245,12 @@ public class LobbyManager : MonoBehaviour
     {
         if (_loginButton == null || _loginButtonText == null) return;
 
-        if (FirebaseManager.Instance != null && FirebaseManager.Instance.IsGoogleLinked)
+        bool isLoggedIn = FirebaseManager.Instance != null && FirebaseManager.Instance.IsGoogleLinked;
+
+        if (_loginImage != null)
+            _loginImage.SetActive(!isLoggedIn);
+
+        if (isLoggedIn)
         {
             _loginButtonText.text = FirebaseManager.Instance.DisplayName ?? "로그인됨";
         }

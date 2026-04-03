@@ -15633,7 +15633,7 @@ MonoBehaviour:
   _bossWaveInterval: 5
   _bossName: Guardian
   _debugBossFirstWave: 0
-  _debugStartWave: 5
+  _debugStartWave: 1
   _skeletonPrefab: {fileID: 9079415542656150256, guid: 93f074b96c23f3943b37a3eae504142b, type: 3}
   _batPrefab: {fileID: 9079415542656150256, guid: 499bf1cc01b2a0a4fbab73376523f64f, type: 3}
   _slimePrefab: {fileID: 9079415542656150256, guid: 5f5a77a05af4e0f4fb85385ff3dbcbf4, type: 3}

@@ -29,7 +29,12 @@
       "Bash(grep -n \"GetComponent\\\\|FindObjectOfType\\\\|Find.*GameObject\" /c/Unity_Project/ProjectC/Assets/Scripts/Player/*.cs)",
       "Bash(wc -l c:/UnityProject/ProjectC/Assets/Scripts/**/*.cs)",
       "Bash(grep -l \"public class.*Enemy\" c:/UnityProject/ProjectC/Assets/Scripts/Enemy/*.cs)",
-      "Bash(grep -l \"BatEnemy\\\\|SlimeRangedAttack\" c:/UnityProject/ProjectC/Assets/Scripts/Enemy/*.cs)"
+      "Bash(grep -l \"BatEnemy\\\\|SlimeRangedAttack\" c:/UnityProject/ProjectC/Assets/Scripts/Enemy/*.cs)",
+      "Bash(xargs grep:*)",
+      "Read(//c/Program Files/**)",
+      "Read(//d/ProjectC/$LOCALAPPDATA/**)",
+      "Read(//c/Program Files/Microsoft/**)",
+      "Bash(find d:/ProjectC -name *.txt -path */ProjectSettings/*)"
     ]
   }
 }
