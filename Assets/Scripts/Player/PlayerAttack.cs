@@ -112,21 +112,19 @@ public class PlayerAttack : MonoBehaviour
 
     Transform FindClosestEnemy()
     {
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-
         Transform closest = null;
-        float closestDistance = _attackRange;
+        float closestSqr = _attackRange * _attackRange;
 
-        foreach (GameObject enemy in enemies)
+        var enemies = Enemy.AliveEnemies;
+        for (int i = 0; i < enemies.Count; i++)
         {
-            // 죽은 적 제외
-            Enemy enemyComp = enemy.GetComponent<Enemy>();
-            if (enemyComp != null && enemyComp.IsDead) continue;
+            Enemy enemy = enemies[i];
+            if (enemy == null || enemy.IsDead) continue;
 
-            float distance = Vector3.Distance(transform.position, enemy.transform.position);
-            if (distance < closestDistance)
+            float sqrDist = (transform.position - enemy.transform.position).sqrMagnitude;
+            if (sqrDist < closestSqr)
             {
-                closestDistance = distance;
+                closestSqr = sqrDist;
                 closest = enemy.transform;
             }
         }
@@ -181,8 +179,7 @@ public class PlayerAttack : MonoBehaviour
 
     void SpawnProjectile(Vector3 position, Vector3 direction, float damageRatio, bool isPierce)
     {
-        GameObject proj = Instantiate(_projectilePrefab, position, Quaternion.LookRotation(direction));
-        Projectile projectile = proj.GetComponent<Projectile>();
+        Projectile projectile = Projectile.Spawn(_projectilePrefab, position, Quaternion.LookRotation(direction));
         if (projectile == null) return;
 
         projectile.Init(direction, _projectileSpeed, damageRatio, isPierce);

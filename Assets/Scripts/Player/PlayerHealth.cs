@@ -79,6 +79,10 @@ public class PlayerHealth : MonoBehaviour
         // 플레이어 피격 데미지 팝업 (빨간색)
         DamagePopup.Create(transform.position + Vector3.up * 2f, damage.ToString(), new Color(1f, 0.3f, 0.3f), 6f);
 
+        // 카메라 셰이크
+        if (TopDownCamera.Instance != null)
+            TopDownCamera.Instance.Shake(0.15f, 0.2f);
+
         // 깜빡임 시작
         if (_flashCoroutine != null) StopCoroutine(_flashCoroutine);
         _flashCoroutine = StartCoroutine(FlashRoutine());
@@ -159,6 +163,23 @@ public class PlayerHealth : MonoBehaviour
     {
         gameObject.SetActive(false);
         OnPlayerDied?.Invoke();
+    }
+    #endregion
+
+    #region Revive
+    /// <summary>부활 처리 (HP 50% 회복 + 무적 적용)</summary>
+    public void Revive()
+    {
+        _currentHp = Mathf.RoundToInt(_maxHp * 0.5f);
+        gameObject.SetActive(true);
+        UpdateHPBar();
+
+        // 부활 직후 무적 적용
+        _lastHitTime = Time.time;
+
+        // 깜빡임 피드백
+        if (_flashCoroutine != null) StopCoroutine(_flashCoroutine);
+        _flashCoroutine = StartCoroutine(FlashRoutine());
     }
     #endregion
 }

@@ -31,6 +31,11 @@ public class GoldManager : MonoBehaviour
         if (Instance != null) { Destroy(gameObject); return; }
         Instance = this;
         LoadGold();
+
+        if (FirebaseManager.Instance != null && FirebaseManager.Instance.IsDataLoaded)
+            SyncFromFirebase();
+        else if (FirebaseManager.Instance != null)
+            FirebaseManager.Instance.OnDataLoaded += SyncFromFirebase;
     }
 
     void OnApplicationQuit()
@@ -79,6 +84,9 @@ public class GoldManager : MonoBehaviour
         _totalGold -= amount;
         PlayerPrefs.SetInt(GOLD_PREFS_KEY, _totalGold);
         PlayerPrefs.Save();
+
+        if (FirebaseManager.Instance != null)
+            FirebaseManager.Instance.SaveTotalGold(_totalGold);
         return true;
     }
 
@@ -92,6 +100,15 @@ public class GoldManager : MonoBehaviour
     {
         PlayerPrefs.SetInt(GOLD_PREFS_KEY, _totalGold);
         PlayerPrefs.Save();
+
+        if (FirebaseManager.Instance != null)
+            FirebaseManager.Instance.SaveTotalGold(_totalGold);
+    }
+
+    void SyncFromFirebase()
+    {
+        _totalGold = FirebaseManager.Instance.GetTotalGold();
+        _loaded = true;
     }
 
     /// <summary>골드 추가 + 코인 날리기</summary>
@@ -104,6 +121,7 @@ public class GoldManager : MonoBehaviour
         else
         {
             _gold += amount;
+            GameStats.AddGold(amount);
             OnGoldChanged?.Invoke(_gold);
         }
     }
@@ -138,6 +156,7 @@ public class GoldManager : MonoBehaviour
     void OnCoinArrived(int amount)
     {
         _gold += amount;
+        GameStats.AddGold(amount);
         OnGoldChanged?.Invoke(_gold);
     }
     #endregion

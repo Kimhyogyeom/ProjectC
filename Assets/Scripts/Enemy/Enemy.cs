@@ -35,6 +35,12 @@ public class Enemy : MonoBehaviour
     [SerializeField] Image _hpBarFill;
     #endregion
 
+    #region Static Enemy List
+    static readonly List<Enemy> _aliveEnemies = new List<Enemy>();
+    /// <summary>현재 살아있는 적 목록 (읽기 전용)</summary>
+    public static IReadOnlyList<Enemy> AliveEnemies => _aliveEnemies;
+    #endregion
+
     #region Private Fields
     int _currentHp;
     Transform _player;
@@ -49,6 +55,7 @@ public class Enemy : MonoBehaviour
     System.Action<float> _onHpChanged;   // 보스 HP바 UI 연동용
     bool _hasMovingParam;
     bool _hasVelocityParam;
+    WaveManager _waveManager;
     #endregion
 
     #region Unity Lifecycle
@@ -102,6 +109,13 @@ public class Enemy : MonoBehaviour
     void Start()
     {
         _player = GameObject.FindGameObjectWithTag("Player").transform;
+        _waveManager = FindFirstObjectByType<WaveManager>();
+        _aliveEnemies.Add(this);
+    }
+
+    void OnDestroy()
+    {
+        _aliveEnemies.Remove(this);
     }
 
     void Update()
@@ -357,27 +371,62 @@ public class Enemy : MonoBehaviour
 
         // 경험치 구슬 스폰
         if (_expOrbPrefab != null)
-            Instantiate(_expOrbPrefab, transform.position, Quaternion.identity);
+            ExpOrb.Spawn(_expOrbPrefab, transform.position);
 
         // HP 회복 아이템 드롭 (10% 확률) — 경험치 구슬과 겹치지 않게 랜덤 오프셋
         if (_healOrbPrefab != null && Random.value < _healDropChance)
         {
             Vector2 offset = Random.insideUnitCircle.normalized * 0.8f;
             Vector3 healPos = transform.position + new Vector3(offset.x, 0.1f, offset.y);
-            Instantiate(_healOrbPrefab, healPos, Quaternion.identity);
+            HealOrb.Spawn(_healOrbPrefab, healPos);
         }
 
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxEnemyDie();
+
+        // 통계 기록
+        GameStats.AddKill(_isBoss);
 
         // 골드 지급 (적 위치에서 UI로 날아감)
         if (GoldManager.Instance != null)
             GoldManager.Instance.AddGold(_goldDrop, transform.position);
 
-        WaveManager waveManager = FindFirstObjectByType<WaveManager>();
-        if (waveManager != null)
-            waveManager.OnEnemyDied();
+        if (_waveManager != null)
+            _waveManager.OnEnemyDied();
+
+        // 보스 처치 슬로우 모션
+        if (_isBoss)
+            StartCoroutine(BossKillSlowMotion());
 
         StartCoroutine(DeathRoutine());
+    }
+
+    IEnumerator BossKillSlowMotion()
+    {
+        // 카메라 셰이크
+        if (TopDownCamera.Instance != null)
+            TopDownCamera.Instance.Shake(0.35f, 0.4f);
+
+        // 슬로우 모션 시작
+        Time.timeScale = 0.1f;
+        Time.fixedDeltaTime = 0.02f * Time.timeScale;
+
+        // 실제 시간 1초 대기 (게임 시간이 아닌 실제 시간)
+        yield return new WaitForSecondsRealtime(1f);
+
+        // 서서히 복귀 (실제 시간 0.5초)
+        float elapsed = 0f;
+        float duration = 0.5f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = elapsed / duration;
+            Time.timeScale = Mathf.Lerp(0.1f, 1f, t);
+            Time.fixedDeltaTime = 0.02f * Time.timeScale;
+            yield return null;
+        }
+
+        Time.timeScale = 1f;
+        Time.fixedDeltaTime = 0.02f;
     }
 
     IEnumerator DeathRoutine()

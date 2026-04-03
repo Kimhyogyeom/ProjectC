@@ -1,5 +1,8 @@
 # Project C — 하이브리드 캐주얼 액션 RPG
 
+> **Git LFS 필요**: 이 프로젝트는 Firebase SDK 대용량 파일을 Git LFS로 관리합니다.
+> clone 전에 `git lfs install`을 먼저 실행해주세요.
+
 ## 프로젝트 개요
 Archero 스타일의 하이브리드 캐주얼 액션 RPG 프로토타입.
 캐주얼한 조작(이동만)으로 즐기면서, RPG 성장 시스템으로 장기 잔존율을 확보하는 구조.
@@ -93,7 +96,7 @@ Archero 스타일의 하이브리드 캐주얼 액션 RPG 프로토타입.
 
 #### UI / 피드백
 - 웨이브 UI (상단 웨이브 번호 + 시작/클리어 중앙 알림)
-- 플레이어 사망 처리 (게임 오버 UI, 재시작/로비 버튼)
+- 플레이어 사망 처리 (게임 오버 UI, 재시작/로비 버튼, 결과 표시, 부활 광고)
 - 전투 피드백 시스템 (데미지 팝업, 몬스터 피격 빨간 깜빡임, MISS 표시, 레벨업 이펙트)
 - 골드 시스템 (적 사망 시 UI로 코인 날아가는 연출 + 카운트업 애니메이션)
 - 일시정지 (BGM/SFX 토글, 이어하기, 재시작, 로비 이동)
@@ -126,6 +129,20 @@ Archero 스타일의 하이브리드 캐주얼 액션 RPG 프로토타입.
 - HP 회복 아이템 (적 처치 시 10% 확률 드롭, 최대 HP 20% 회복)
 - 경험치 구슬 / 힐 아이템 3D 모델 적용 + 회전 애니메이션
 
+#### Firebase 연동
+- Firebase SDK 설치 + 프로젝트 연결 (google-services.json, Git LFS 적용)
+- Firebase Auth 익명 로그인 구현
+- Firestore 유저 데이터 저장/불러오기 (골드, 강화 레벨)
+- 기존 PlayerPrefs → Firestore 연동 (오프라인 폴백 유지)
+- 기존 유저 PlayerPrefs → Firestore 자동 마이그레이션
+
+#### Google Play Games 로그인
+- Google Play Games v2 SDK 연동
+- 익명 → Google 계정 자동 연결 (기존 데이터 유지)
+- Google 계정별 재화/강화 데이터 분리
+- 크로스 디바이스 데이터 동기화 지원
+- 로비에 로그인 버튼 추가 (실기기 전용, 에디터는 DummyClient)
+
 #### 기타
 - 카메라 경계 제한 (BoxCollider 기반 클램프 + 고정 회전)
 - 플레이어/적/표창 3D 모델 + 애니메이션 연동
@@ -133,22 +150,47 @@ Archero 스타일의 하이브리드 캐주얼 액션 RPG 프로토타입.
 - 던전 맵 제작 (용암 던전 테마, NavMesh 베이크 완료)
 - 스킬 디버그 키 (에디터 전용, 숫자 1~7키로 스킬 즉시 레벨업)
 
+#### 성능 최적화
+- **적 리스트 캐싱** — `FindGameObjectsWithTag("Enemy")` 제거, `static List<Enemy>` 중앙 관리로 변경하여 매 공격마다 발생하던 씬 전체 탐색 및 GC 할당 제거
+- **경험치 구슬 감지 주기 제한** — `Physics.OverlapSphere` 호출을 매 프레임에서 0.15초 간격으로 변경, 초당 물리 연산 약 90% 절감
+- **컴포넌트 참조 캐싱** — 분신술 스킬에서 매 프레임 `GetComponentInChildren<Animator>()` 호출을 `Awake()` 1회 캐싱으로 변경
+- **오브젝트 풀링 적용** — 표창 투사체, 슬라임 투사체, 경험치 구슬, 힐 아이템, 보스 경고 이펙트에 오브젝트 풀링 도입. `Instantiate`/`Destroy` 반복을 제거하여 GC 스파이크 방지
+- **MaterialPropertyBlock 캐싱** — 보스 경고 이펙트에서 루프마다 `new MaterialPropertyBlock()` 생성을 1개 인스턴스 재사용으로 변경
+- **거리 비교 최적화** — `Vector3.Distance`를 `sqrMagnitude`로 변경하여 제곱근(sqrt) 연산 제거
+- **미사용 스크립트 제거** — 빈 `Update()`를 가진 Init.cs 삭제로 불필요한 매 프레임 호출 제거
+
 ### 🔧 이후 작업
 
+#### 🔴 즉시 해야 할 것 (Google 로그인 실기기 동작에 필요)
+1. **Google Play Console 앱 등록** — 내부 테스트 트랙으로 앱 등록
+2. **Play Games Services 활성화** — Google Play Console → Play Games Services → 설정
+3. **OAuth 클라이언트 연결** — Firebase SHA-1과 동일한 인증서로 OAuth 클라이언트 생성/연결
+4. **실기기 빌드 테스트** — APK 빌드 → 기기 설치 → Google 로그인 확인
+
+#### UI / 시스템
+5. **튜토리얼** — 첫 플레이 시 조이스틱/스킬 선택 안내
+6. **로그인 UI 디자인** — 로그인 버튼 디자인 적용 (현재 기능만 구현)
+
+#### 리텐션
+7. **데일리 보상** — 출석 보상 시스템 (로비에서 매일 골드 지급)
+8. **오프라인 보상** — 접속 안 한 시간만큼 골드 지급
+9. **업적/도전과제** — 목표 달성 시 보상 (보스 처치 N회 등)
+
 #### 콘텐츠
-1. **소품 배치** — 기둥, 횃불 등 던전 오브젝트로 맵 채우기
+10. **소품 배치** — 기둥, 횃불 등 던전 오브젝트로 맵 채우기
+11. **추가 스테이지** — 새로운 맵/테마
 
 #### 수익화
-2. **IAP** — 인앱 결제
-3. **보석 상점** — 광고/IAP 연동
+12. **IAP** — 인앱 결제
+13. **보석 상점** — 광고/IAP 연동
+14. **LevelPlay Placement 등록** — 부활 광고 배치 추가 (수익 분석용, 필수 아님)
 
 #### 장기
-4. **장비 시스템** — 무기 3~5종, 강화/합성
-5. **추가 스테이지**
+15. **장비 시스템** — 무기 3~5종, 강화/합성
 
 ### 📌 참고
 - **로비 버튼 (상점/보석/광고)**: 껍데기만 있음 → 각 시스템 구현 후 연결
-- **골드 저장**: PlayerPrefs로 영구 저장 → 서버 연동 시 교체 예정
+- **골드 저장**: Firebase Firestore 연동 완료 (오프라인 시 PlayerPrefs 폴백)
 - **에디터 Debug 메뉴**: 상단 `Debug` → 골드 지급/초기화, 강화 리셋, 전체 초기화
 - **카메라 경계**: 새 스테이지 추가 시 BoxCollider 오브젝트만 배치하면 됨
 - **보스 테스트**: WaveManager → `Debug Boss First Wave` 체크하면 1웨이브에 보스 즉시 등장
@@ -194,13 +236,15 @@ Archero 스타일의 하이브리드 캐주얼 액션 RPG 프로토타입.
 ## 기술 스택
 - **엔진**: Unity 6
 - **언어**: C#
+- **서버**: Firebase (Auth, Firestore)
+- **광고**: LevelPlay (ironSource)
 - **타겟 플랫폼**: Mobile (Android / iOS)
 
 ## 프로젝트 구조
 ```
 Assets/
 ├── Scripts/
-│   ├── Core/           # WaveManager, AudioManager, GoldManager 등 공통
+│   ├── Core/           # WaveManager, AudioManager, GoldManager, FirebaseManager 등 공통
 │   ├── Player/         # PlayerController, PlayerHealth, PlayerAttack
 │   ├── Enemy/          # Enemy AI, BossBehavior
 │   ├── Skill/          # 스킬 데이터, 선택 UI

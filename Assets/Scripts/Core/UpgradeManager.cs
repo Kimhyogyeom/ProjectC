@@ -12,16 +12,18 @@ public static class UpgradeManager
 {
     const int BASE_COST = 1000;
 
-    // 레벨당 증가량
-    const int DAMAGE_PER_LEVEL = 1;         // 기본 10
-    const int HP_PER_LEVEL = 5;             // 기본 100
-    const float SPEED_PER_LEVEL = 0.1f;     // 기본 5
-    const float ATK_SPD_PER_LEVEL = 0.01f;  // 기본 0.5s
+    const int DAMAGE_PER_LEVEL = 1;
+    const int HP_PER_LEVEL = 5;
+    const float SPEED_PER_LEVEL = 0.1f;
+    const float ATK_SPD_PER_LEVEL = 0.01f;
 
     static string GetPrefsKey(StatType type) => $"Upgrade_{type}";
 
     public static int GetLevel(StatType type)
     {
+        if (FirebaseManager.Instance != null && FirebaseManager.Instance.IsDataLoaded)
+            return FirebaseManager.Instance.GetUpgradeLevel(type);
+
         return PlayerPrefs.GetInt(GetPrefsKey(type), 0);
     }
 
@@ -39,6 +41,9 @@ public static class UpgradeManager
         int newLevel = GetLevel(type) + 1;
         PlayerPrefs.SetInt(GetPrefsKey(type), newLevel);
         PlayerPrefs.Save();
+
+        if (FirebaseManager.Instance != null)
+            FirebaseManager.Instance.SaveUpgradeLevel(type, newLevel);
         return true;
     }
 

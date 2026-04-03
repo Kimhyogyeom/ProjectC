@@ -31,6 +31,8 @@ public class PlayerLevel : MonoBehaviour
     int _expRequired;
     float _orbRadiusMultiplier = 1f;    // 자석 스킬 배율
     bool _isGlobalMagnet = false;       // 자석 Lv5: 맵 전체 흡수
+    float _orbCheckTimer = 0f;
+    const float ORB_CHECK_INTERVAL = 0.15f;
     #endregion
 
     #region Debug (Inspector 실시간 확인용)
@@ -53,6 +55,10 @@ public class PlayerLevel : MonoBehaviour
 
     void Update()
     {
+        _orbCheckTimer += Time.deltaTime;
+        if (_orbCheckTimer < ORB_CHECK_INTERVAL) return;
+        _orbCheckTimer = 0f;
+
         // 주변 경험치 구슬 감지 및 흡수 (자석 Lv5: 매우 큰 반경)
         float radius = _isGlobalMagnet ? 999f : OrbPickupRadius;
         Collider[] orbs = Physics.OverlapSphere(transform.position, radius);
@@ -87,8 +93,6 @@ public class PlayerLevel : MonoBehaviour
     {
         _currentLevel++;
         _expRequired = Mathf.RoundToInt(_baseExpRequired * Mathf.Pow(_expGrowthRate, _currentLevel - 1));
-
-        Debug.Log($"레벨업! 현재 레벨: {_currentLevel} / 다음 레벨까지: {_expRequired}");
 
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySfxLevelUp();
 

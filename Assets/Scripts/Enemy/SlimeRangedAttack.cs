@@ -66,9 +66,7 @@ public class SlimeRangedAttack : MonoBehaviour
         dir.y = 0f;
 
         Vector3 spawnPos = transform.position + Vector3.up * 0.5f;
-        GameObject proj = Instantiate(_projectilePrefab, spawnPos, Quaternion.identity);
-
-        SlimeProjectile sp = proj.GetComponent<SlimeProjectile>();
+        SlimeProjectile sp = SlimeProjectile.Spawn(_projectilePrefab, spawnPos);
         if (sp != null)
             sp.Init(dir, _enemy.Damage);
     }
